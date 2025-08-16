@@ -30,7 +30,7 @@ function App() {
           />
         </svg>
       </header>
-   <Hero video={false} />
+   <Hero video={true} />
       <section className="lyric special-elite-regular">
         A bunch of stupid kids scared to death of only what’s in front of them.
         <div className='merch-wrapper'>
