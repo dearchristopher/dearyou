@@ -34,6 +34,14 @@ section.house-wrap img {
   margin-bottom: 32px;
 }
 
+section.house-wrap iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  margin-bottom: 32px;
+}
+
 section .house {
   max-width: 100%;
   margin-bottom: 24px;
@@ -60,3 +68,14 @@ section.copyright {
   margin: 0 auto;
   margin-top: auto;
 }
+
+.merch-wrapper {
+    padding-top: 12px;
+}
+
+.merch-wrapper button {
+ font-family: "Special Elite", system-ui;
+ font-weight: 400;
+ padding: 4px;
+ cursor: pointer;
+}    

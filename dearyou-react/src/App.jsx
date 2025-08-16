@@ -1,3 +1,5 @@
+import { Hero } from "./components/hero"
+
 function App() {
   return (
     <>
@@ -28,12 +30,14 @@ function App() {
           />
         </svg>
       </header>
-      <section className="house-wrap">
-        <img src="/assets/2328.jpg" alt="2328" />
-      </section>
+   <Hero video />
       <section className="lyric special-elite-regular">
         A bunch of stupid kids scared to death of only what’s in front of them.
+        <div className='merch-wrapper'>
+          <button type='button' onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}>Shop</button>
+        </div>
       </section>
+  
       <section className="copyright special-elite-regular">
         Copyright Dear You 2025.
       </section>
