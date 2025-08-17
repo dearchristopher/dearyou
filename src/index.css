@@ -1,0 +1,86 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  text-align: center;
+  background: #ffffff;
+  padding: 24px 24px 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+header svg {
+  width: 160px;
+}
+
+section.house-wrap {
+  max-width: 620px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+section.house-wrap img {
+  max-width: 100%;
+  margin-bottom: 32px;
+}
+
+section.house-wrap iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  margin-bottom: 32px;
+}
+
+section .house {
+  max-width: 100%;
+  margin-bottom: 24px;
+}
+
+.special-elite-regular {
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+section.lyric {
+  font-size: 14px;
+  max-width: 600px;
+  margin: 0 auto 96px;
+}
+
+section.copyright {
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: auto;
+  margin-bottom: 10px;
+}
+
+.merch-wrapper {
+    padding-top: 12px;
+}
+
+.merch-wrapper button {
+ font-family: "Special Elite", system-ui;
+ font-weight: 400;
+ padding: 4px;
+ cursor: pointer;
+}    
