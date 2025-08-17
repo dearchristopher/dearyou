@@ -1,4 +1,5 @@
 import { Hero } from "./components/hero"
+import { House } from "./components/house"
 
 function App() {
   return (
@@ -33,7 +34,22 @@ function App() {
    <Hero video={true} />
      <div>
        <section className="lyric special-elite-regular">
-        A bunch of stupid kids scared to death of only what’s in front of them.
+        <p>
+          It's been a while. We're a little older now, still finding our way through life since we last talked. Dear You has always been our outlet to pour our energy, our friendships, our stories, our laughter, and sometimes even our struggles. It was such a steady force for us, which made walking away harder than we could ever explain.
+        </p>
+        
+        <p>
+          We know we never really gave you that explanation, and that's something we've carried with us. We've been writing again, and pouring everything we have into something bigger. And now, we'd love to share it with you.
+        </p>
+        
+        <p>
+          We hope you'll have us back. Let's walk through this next chapter together.
+        </p>
+        
+        <p>
+          It's time to come home. 
+          8/29/25 
+        </p>
         <div className='merch-wrapper'>
           <img 
             src="/assets/shop.png" 

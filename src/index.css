@@ -46,6 +46,16 @@ section.house-wrap iframe {
   margin-bottom: 32px;
 }
 
+
+section.house-wrap video {
+  width: 100%;
+  max-width: 620px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  margin-bottom: 32px;
+}
+
 section .house {
   max-width: 100%;
   margin-bottom: 24px;
