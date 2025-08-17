@@ -76,6 +76,15 @@ section.copyright {
 
 .merch-wrapper {
     padding-top: 12px;
+    margin-top: 32px;
+
+    img {
+      transition: transform 0.3s ease;
+    }
+    
+    img:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
 }
 
 .merch-wrapper button {

@@ -33,9 +33,14 @@ function App() {
    <Hero video={false} />
       <section className="lyric special-elite-regular">
         A bunch of stupid kids scared to death of only what’s in front of them.
-        {/* <div className='merch-wrapper'>
-          <button type='button' onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}>Shop</button>
-        </div> */}
+        <div className='merch-wrapper'>
+          <img 
+            src="/assets/shop.png" 
+            alt="Shop" 
+            onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}
+            style={{ cursor: 'pointer', width: '100%', maxWidth: '720px', height: 'auto' }}
+          />
+        </div>
       </section>
   
       <section className="copyright special-elite-regular">
