@@ -48,6 +48,7 @@ function App() {
         
         <p>
           It's time to come home. 
+          8/29/25 
         </p>
         <div className='merch-wrapper'>
           <img 
