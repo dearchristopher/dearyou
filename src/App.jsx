@@ -30,17 +30,26 @@ function App() {
           />
         </svg>
       </header>
-   <Hero video={false} />
-      <section className="lyric special-elite-regular">
+   <Hero video={true} />
+     <div>
+       <section className="lyric special-elite-regular">
         A bunch of stupid kids scared to death of only what’s in front of them.
-        {/* <div className='merch-wrapper'>
-          <button type='button' onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}>Shop</button>
-        </div> */}
+        <div className='merch-wrapper'>
+          <img 
+            src="/assets/shop.png" 
+            alt="Click to visit the Dear You shop" 
+            title="Click to visit the Dear You shop"
+            onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}
+            style={{ cursor: 'pointer', width: '100%', maxWidth: '720px', height: 'auto' }}
+          />
+        </div>
       </section>
   
       <section className="copyright special-elite-regular">
-        Copyright Dear You 2025.
+        <p>You found the bottom. Are you looking for the shop? <a href="https://shop.dearyoutx.com" target="_blank" rel="noopener noreferrer">Click Here</a></p>
+        <p>Copyright Dear You 2025.</p>
       </section>
+     </div>
     </>
   )
 }
