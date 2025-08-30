@@ -4,14 +4,79 @@ function App() {
   return (
     <>
       <Hero
-        video={true}
-        youtubeId="vbsMxqJWuKY"
+        video={false}
         bgImage="/assets/2328_art.jpg"
+        subtitle="2328"
         ctaHref="https://sl.cmdshft.com/2328"
-        ctaLabel="Stream Now"
+        ctaLabel="Listen Now"
+        showPlatforms={false}
+        grain={true}
       />
-      <div>
 
+      {/* Track highlight split: lyric + player card */}
+      <section className="track" id="track">
+        <div className="track__grid">
+          <div className="track__lyric special-elite-regular">
+            <p>
+              We grew from the floor.
+            </p>
+          </div>
+          <div className="track__player">
+            <div className="track__video">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/vbsMxqJWuKY"
+                title=""
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Polaroid photo row */}
+      <section className="polaroids" aria-label="Band photos">
+        <div className="polaroid">
+          <img src="/assets/jamroom.jpg" alt="Band polaroid 1" />
+        </div>
+        <div className="polaroid polaroid--b">
+          <img src="/assets/livingroom.jpg" alt="Band polaroid 2" />
+        </div>
+      </section>
+
+      {/* Horizontal photo carousel */}
+      <section className="carousel" aria-label="2328 photos">
+        <div className="carousel__rail">
+          <img src="/assets/jamroom2.png" alt="Jam room shenanigans" />
+          <img src="/assets/dystage.jpg" alt="On Stage" />
+          <img src="/assets/dannychris.jpg" alt="Danny and Chris" />
+          <img src="/assets/2328_art.jpg" alt="2328 artwork alt" />
+        </div>
+      </section>
+
+      {/* About narrative */}
+      <section className="track__lyric special-elite-regular" id="about">
+        <p>
+          It's been a while. We're a little older now, still finding our way through life since we last talked. Dear You has always been our outlet to pour our energy, our friendships, our stories, our laughter, and sometimes even our struggles. It was such a steady force for us, which made walking away harder than we could ever explain.
+        </p>
+        <p>
+          We know we never really gave you that explanation, and that's something we've carried with us. We've been writing again, and pouring everything we have into something bigger. And now, we'd love to share it with you.
+        </p>
+        <p>
+          We hope you'll have us back. Let's walk through this next chapter together.
+        </p>
+        <em className="special-elite-regular">It’s time to come home.</em>
+      </section>
+
+      {/* Shop link */}
+      <section className="shop-section">
+        <a href="https://shop.dearyoutx.com" target="_blank" rel="noopener noreferrer">
+          <img src="/assets/shop.png" alt="Shop Dear You Merch" />
+        </a>
+      </section>
+
+      {/* Footer with socials and simple email signup */}
+      <footer className="site-footer">
         <section className="social-cta" aria-label="Follow Dear You on social media">
           <a
             className="social-btn social-btn--ig"
@@ -36,48 +101,8 @@ function App() {
             <span>dearyoutx</span>
           </a>
         </section>
-
-        {/* <section className="tagline special-elite-regular">
-          <h2>
-            This room is home
-            <br />
-            looking through the front door
-          </h2>
-        </section> */}
-
-       <section className="lyric special-elite-regular">
-        {/* <p>
-          It's been a while. We're a little older now, still finding our way through life since we last talked. Dear You has always been our outlet to pour our energy, our friendships, our stories, our laughter, and sometimes even our struggles. It was such a steady force for us, which made walking away harder than we could ever explain.
-        </p>
-        
-        <p>
-          We know we never really gave you that explanation, and that's something we've carried with us. We've been writing again, and pouring everything we have into something bigger. And now, we'd love to share it with you.
-        </p>
-        
-        <p>
-          We hope you'll have us back. Let's walk through this next chapter together.
-        </p>
-        
-        <p>
-          It's time to come home. 
-          8/29/25 
-        </p> */}
-        <div className='merch-wrapper'>
-          <img 
-            src="/assets/shop.png" 
-            alt="Click to visit the Dear You shop" 
-            title="Click to visit the Dear You shop"
-            onClick={() => window.open('https://shop.dearyoutx.com', '_blank')}
-            style={{ cursor: 'pointer', width: '100%', maxWidth: '720px', height: 'auto' }}
-          />
-        </div>
-      </section>
-  
-      <section className="copyright special-elite-regular">
-        <p>You found the bottom. Are you looking for the shop? <a href="https://shop.dearyoutx.com" target="_blank" rel="noopener noreferrer">Click Here</a></p>
-        <p>Copyright Dear You 2025.</p>
-      </section>
-     </div>
+        <small className="special-elite-regular">© Dear You 2025</small>
+      </footer>
     </>
   )
 }
