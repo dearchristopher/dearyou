@@ -20,6 +20,17 @@ export function Hero({
     youtubeId,
 }: HeroProps) {
     const [open, setOpen] = React.useState(false)
+
+    // Lock body scroll when modal is open
+    React.useEffect(() => {
+        const body = document.body
+        if (open) {
+            body.classList.add('no-scroll')
+        } else {
+            body.classList.remove('no-scroll')
+        }
+        return () => body.classList.remove('no-scroll')
+    }, [open])
     return (
         <section
             className="hero"
@@ -31,7 +42,7 @@ export function Hero({
                         {youtubeId ? (
                             <div className="hero__video">
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&playlist=${youtubeId}&controls=0&modestbranding=1&rel=0&playsinline=1`}
+                                    src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&controls=0&modestbranding=1&rel=0&playsinline=1`}
                                     title={title ?? 'YouTube player'}
                                     allow="autoplay; encrypted-media; picture-in-picture"
                                     allowFullScreen
