@@ -46,10 +46,55 @@ section.carousel { max-width: 900px; margin: 56px auto; padding: 0 16px; }
 .carousel__rail { display: grid; grid-auto-flow: column; grid-auto-columns: 70%; gap: 16px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; }
 .carousel__rail img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); scroll-snap-align: start; }
 
-/* Shop section */
-.shop-section { max-width: 600px; margin: 56px auto; padding: 0 16px; text-align: center; }
-.shop-section img { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); transition: transform 0.3s ease; }
-.shop-section a:hover img { transform: scale(1.02); }
+/* Merch cards */
+.merch-cards { 
+  max-width: 1100px; 
+  margin: 56px auto; 
+  padding: 0 16px; 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 24px; 
+}
+
+.merch-card { 
+  background: #e8dbc1; 
+  border-radius: 14px; 
+  box-shadow: 0 18px 36px rgba(0,0,0,0.28); 
+  padding: 16px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.merch-card:hover { 
+  transform: translateY(-4px); 
+}
+
+.merch-card img { 
+  width: 100%; 
+  height: 200px; 
+  object-fit: cover; 
+  border-radius: 10px; 
+  margin-bottom: 12px; 
+}
+
+.merch-card h3 { 
+  margin: 0 0 12px; 
+  font-size: 18px; 
+  color: #1b1712; 
+}
+
+.merch-card .btn { 
+  margin-top: auto; 
+}
+
+/* Shop CTA */
+.shop-cta {
+  text-align: center;
+  margin: 32px auto 56px;
+}
 
 /* Polaroids */
 section.polaroids { max-width: 1100px; margin: 24px auto 0; padding: 0 16px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
@@ -72,7 +117,17 @@ section.about p { font-size: 16px; line-height: 1.7; }
 section.about em { display: block; margin-top: 12px; }
 
 /* About section with smaller text */
-#about.track__lyric { font-size: clamp(16px, 2.4vw, 24px); max-width: 800px; margin: 56px auto; padding: 0 16px; }
+#about.track__lyric { 
+  font-size: clamp(16px, 2.4vw, 24px); 
+  margin: 56px auto; 
+  padding: 32px 24px; 
+  position: relative;
+  border-radius: 16px;
+  background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('/assets/2328.jpg');
+  background-size: cover;
+  background-position: center;
+  backdrop-filter: blur(20px);
+}
 
 /* Footer */
 footer.site-footer { margin: 72px 0 24px;  padding-bottom: 10px;}
@@ -83,6 +138,7 @@ footer small { display: block; color: #c8b89a; margin-top: 8px; }
   .track__grid { grid-template-columns: 1fr; }
   .carousel__rail { grid-auto-columns: 84%; }
   .merch__grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .merch-cards { grid-template-columns: 1fr; gap: 20px; }
 }
 
 body.no-scroll { overflow: hidden; }
@@ -222,7 +278,7 @@ section.house-wrap video {
 }
 
 .btn-primary {
-  background: #cc7a3b;
+  background: #b85450;
   color: #f6efe2;
   padding: 12px 22px;
   border-radius: 10px;

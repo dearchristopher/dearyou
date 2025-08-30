@@ -5,7 +5,7 @@ function App() {
     <>
       <Hero
         video={false}
-        bgImage="/assets/2328_art.jpg"
+        bgImage="/assets/2328_art_optimized.jpg"
         subtitle="2328"
         ctaHref="https://sl.cmdshft.com/2328"
         ctaLabel="Listen Now"
@@ -68,10 +68,35 @@ function App() {
         <em className="special-elite-regular">It’s time to come home.</em>
       </section>
 
-      {/* Shop link */}
-      <section className="shop-section">
-        <a href="https://shop.dearyoutx.com" target="_blank" rel="noopener noreferrer">
-          <img src="/assets/shop.png" alt="Shop Dear You Merch" />
+      {/* Merch cards */}
+      <section className="merch-cards">
+        <div className="merch-card">
+          <img src="/assets/dyhat.webp" alt="Dear You Hat" />
+          <h3 className="special-elite-regular">Dad Cap</h3>
+          <a className="btn btn-primary" href="https://shop.dearyoutx.com/products/adjust-dad-cap-black" target="_blank" rel="noopener noreferrer">
+            Buy Now
+          </a>
+        </div>
+        <div className="merch-card">
+          <img src="/assets/ghostietan.webp" alt="Ghostie Tan Shirt" />
+          <h3 className="special-elite-regular">Ghost</h3>
+          <a className="btn btn-primary" href="https://shop.dearyoutx.com/products/ghost" target="_blank" rel="noopener noreferrer">
+            Buy Now
+          </a>
+        </div>
+        <div className="merch-card">
+          <img src="/assets/2328shirt.webp" alt="2328 Shirt" />
+          <h3 className="special-elite-regular">2328</h3>
+          <a className="btn btn-primary" href="https://shop.dearyoutx.com/products/2328-1" target="_blank" rel="noopener noreferrer">
+            Buy Now
+          </a>
+        </div>
+      </section>
+
+      {/* General shop CTA */}
+      <section className="shop-cta">
+        <a className="btn btn-primary" href="https://shop.dearyoutx.com" target="_blank" rel="noopener noreferrer">
+          Shop All Merch
         </a>
       </section>
 
