@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you — C · folklore broadsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<script>
+  window.HERO_PHOTO = { base: "assets/img/band-placeholder", alt: "dear you standing in a sandy clearing in front of a pine treeline", focus: "55% 50%" };
+</script>
+<style>
+  /* C · FOLKLORE BROADSHEET — flat ghost-story pamphlet. Two columns, marginalia in the gutter, oversized hand lettering crossing the bleed. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+  body { margin: 0; background: var(--bone-100); color: var(--ink-900); overflow-x: clip;
+         font: 400 1.125rem/1.55 "IM Fell English", Georgia, serif; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--rust-600); }
+  :focus-visible { outline: 1px solid var(--ink-900); outline-offset: 4px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .logo { display: block; height: auto; fill: currentColor; color: var(--ink-900); }
+  .hand { line-height: .82; text-decoration: none; color: var(--ink-900); }
+  .hand { display: inline-block; } .hand .hw { display: block; height: 1.5em; width: auto; fill: currentColor; overflow: visible; }
+  .hand .hw-you-found-the-bottom { height: 2.6em; } .hand .hw-elsewhere { height: 1.3em; }
+  .sc { font-family: "IM Fell English SC", "IM Fell English", serif; letter-spacing: .04em; }
+  .pad { padding: 0 1.25rem; }
+  @media (min-width: 900px) { .pad { padding: 0 3vw; } }
+
+  /* masthead */
+  .mast { border-bottom: 1px solid var(--ink-800); }
+  .mast .row { display: flex; justify-content: space-between; gap: 1rem; padding-block: .6rem; font-size: .85rem; border-bottom: 1px solid var(--ink-800); }
+  .mast .row nav { display: flex; gap: .9rem; flex: none; align-items: center; }
+  .mast .big { width: 128vw; margin: 1.5rem 0 -1px -2vw; }   /* crosses the right bleed */
+  @media (min-width: 900px) { .mast .big { width: 118vw; margin-top: 2rem; } }
+
+  .bleed { width: 100vw; height: min(72svh, 760px); overflow: hidden; background: var(--ink-900); }
+  .bleed picture, .bleed img { width: 100%; height: 100%; }
+  .bleed img { object-fit: cover; filter: saturate(.45) sepia(.2) contrast(1.06); }
+  .plate-cap { font-size: .9rem; font-style: italic; padding-block: .5rem; border-bottom: 1px solid var(--ink-800); }
+
+  /* the sheet: marginalia | col | col */
+  .sheet { display: grid; gap: 1.5rem; padding-block: 4rem; }
+  .note { font-size: .85rem; line-height: 1.4; font-style: italic; color: var(--ink-700); }
+  .note::before { content: attr(data-mark) " "; font-style: normal; color: var(--ink-900); }
+  @media (min-width: 900px) {
+    .sheet { grid-template-columns: 11rem 1fr 1fr; gap: 0 2.25rem; padding-block: 6rem; }
+    .sheet > .c1 { grid-column: 2; padding-right: 2.25rem; border-right: 1px solid var(--ink-800); margin-right: -2.25rem; }
+    .sheet > .c2 { grid-column: 3; }
+    .sheet > .m { grid-column: 1; }
+    .sheet > .wide { grid-column: 2 / span 2; }
+  }
+  .lede::first-letter { float: left; font-size: 4.6em; line-height: .78; padding: .08em .08em 0 0; }
+  h2.kicker { font-family: "IM Fell English SC", serif; font-weight: 400; font-size: 1rem; letter-spacing: .06em; margin: 0 0 1rem; border-top: 1px solid var(--ink-800); padding-top: .5rem; }
+
+  /* listen: oversized hand word crossing the left bleed */
+  .shout { font-size: 30vw; margin: 0 0 0 -4vw; white-space: nowrap; display: block; }
+  .shout .hw { height: 1em; }
+  @media (min-width: 900px) { .shout { font-size: 22vw; } }
+  .art { aspect-ratio: 1; overflow: hidden; }
+  .art img { width: 100%; height: 100%; object-fit: cover; }
+  .cap { font-size: .9rem; font-style: italic; margin-top: .6rem; }
+  .links { margin-top: .4rem; } .links a { margin-right: .7rem; } .links .mk { margin: 0 .7rem 0 -.65rem; }
+  .held .art { background: var(--ink-900); display: grid; place-items: start center; width: 60%; }
+  .held .t2 { width: 14%; } .held .t2 img { width: 100%; height: auto; }
+  .redact { display: grid; gap: .55rem; margin-top: 1.5rem; }
+  .redact span { display: block; height: .8rem; background: var(--ink-900); }
+
+  /* the column rule tease-04 sits on (keep translateY(32%)) */
+  .ledge { position: relative; border-top: 1px solid var(--ink-800); margin-top: 4rem; }
+  .ledge .t4 { position: absolute; bottom: 100%; right: 18%; height: 56px; margin-bottom: -1px; transform: translateY(32%); }
+  .ledge .t4 img { height: 100%; width: auto; }
+
+  /* a notice: tease-01 over a full rule, redacted columns beneath */
+  .omen { padding-top: clamp(8rem, 20vw, 16rem); }
+  .omen .rule { position: relative; border-top: 1px solid var(--ink-800); }
+  .omen .t1 { position: absolute; bottom: 100%; left: 30%; width: 140px; height: 56px; overflow: hidden; margin-bottom: -1px; -webkit-tap-highlight-color: transparent; }
+  .omen .t1 img { width: 100%; height: auto; transform: translateY(100%); transition: transform 3.2s var(--ease-in-out); }
+  .omen.peek .t1 img { transform: translateY(0); }
+  .omen.gone .t1 img { transform: translateY(100%); transition-duration: .4s; }
+  .omen .egg { position: absolute; left: 30%; top: .6rem; font-style: italic; opacity: 0; transition: opacity 1.2s; }
+  .omen.gone .egg { opacity: 1; }
+  .omen .cols { display: grid; gap: 1.5rem; margin-top: 2.5rem; }
+  @media (min-width: 900px) { .omen .t1 { width: 200px; height: 80px; } .omen .cols { grid-template-columns: 1fr 1fr 1fr; gap: 2.25rem; } }
+
+  /* elsewhere: an index with dot leaders */
+  .index { list-style: none; margin: 0; padding: 0; }
+  .index li { display: flex; align-items: baseline; gap: .4rem; padding: .2rem 0; font-size: 1.35rem; }
+  .index li::after { content: ""; order: 2; flex: 1; border-bottom: 1px dotted var(--ink-700); transform: translateY(-.3em); }
+  .index li a { order: 1; text-decoration: none; } .index li a:hover { text-decoration: underline; }
+  .index li span { order: 3; font-size: .85rem; font-style: italic; color: var(--ink-700); }
+  .elsew { font-size: 15vw; margin: 0 0 1rem; display: block; }
+  @media (min-width: 900px) { .elsew { font-size: 7rem; } }
+
+  footer { border-top: 1px solid var(--ink-800); margin-top: 6rem; padding-block: 3rem 1.5rem; display: grid; gap: 1rem; }
+  footer .logo { width: min(80vw, 420px); }
+  footer .bottom { font-size: 1.3rem; margin: 0; }
+  footer .imprint { font-size: .8rem; font-style: italic; color: var(--ink-700); }
+
+  @media (prefers-reduced-motion: reduce) { .omen .t1 img { transform: none; transition: none; } }
+</style>
+</head>
+<body>
+<h1 class="sr-only">dear you</h1>
+
+<header class="mast">
+  <div class="row pad sc"><span>a pamphlet · beaumont, texas · no. 1 · free</span>
+    <nav aria-label="Primary"><a class="hand" data-hand="H01" href="#about" aria-label="about"><svg class="hw hw-about" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></a><a class="hand" data-hand="H02" href="#listen" aria-label="listen"><svg class="hw hw-listen" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a><a class="hand" data-hand="H04" href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw hw-merch" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a></nav></div>
+  <svg class="logo big" viewBox="0 0 3072 2284" aria-hidden="true"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+</header>
+
+<div class="bleed" id="hero-photo"></div>
+<p class="plate-cap pad">the four of them (two pictured), in a clearing. 2025. [placeholder photograph]</p>
+
+<main class="pad">
+  <section class="sheet" id="about">
+    <p class="note m" data-mark="†">placeholder. the band will write its own account.</p>
+    <div class="c1"><h2 class="kicker">concerning the band</h2>
+      <p class="lede">four friends from beaumont, texas. we stopped for ten years and couldn't stay quiet. we're making the record we always meant to.†</p></div>
+    <div class="c2"><h2 class="kicker">what is known</h2>
+      <p>they left in 2015 and came back in 2025. four songs have surfaced since. the newest is below.</p></div>
+  </section>
+
+  <span class="hand shout" id="listen" data-hand="H03"><span class="sr-only">listen</span><svg class="hw hw-listen" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></span>
+
+  <section class="sheet" style="padding-top:2rem">
+    <div class="m">
+      <p class="note" data-mark="*">out now, everywhere.</p>
+      <p class="note" data-mark="‡" style="margin-top:2rem">bandcamp helps them most.</p>
+    </div>
+    <figure class="c1" style="margin:0">
+      <div class="art"><picture>
+        <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="(min-width:900px) 34vw, 100vw">
+        <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="(min-width:900px) 34vw, 100vw">
+        <img src="assets/img/fault-line-cover-600.jpg" alt="fault line cover" loading="lazy" decoding="async"></picture></div>
+      <figcaption class="cap"><span class="sc">fault line</span>, a single, 2026.* <span class="hand" data-hand="H05" style="font-size:1.2rem;margin-left:.4rem"><span class="sr-only">out now</span><svg class="hw hw-out-now" viewBox="0 0 2000 1512" aria-hidden="true" focusable="false"><use href="assets/hand/out-now.svg#h"/></svg></span></figcaption>
+      <div class="links"><a href="#">spotify</a><a href="#">apple music</a><a href="#">bandcamp</a><span class="mk">‡</span><a href="#">youtube</a></div>
+    </figure>
+    <div class="c2 held" aria-label="next single, not yet">
+      <h2 class="kicker">the next one</h2>
+      <div class="art"><picture class="t2" aria-hidden="true"><source type="image/webp" srcset="assets/img/tease-02.webp"><img src="assets/img/tease-02.png" alt="" loading="lazy"></picture></div>
+      <p class="cap">next. not yet.</p>
+      <div class="redact" aria-hidden="true"><span style="width:92%"></span><span style="width:70%"></span><span style="width:84%"></span></div>
+      <div class="ledge" aria-hidden="true"><picture class="t4"><source type="image/webp" srcset="assets/img/tease-04.webp"><img src="assets/img/tease-04.png" alt="" loading="lazy"></picture></div>
+    </div>
+  </section>
+
+  <section class="omen" id="omen" aria-label="something is coming">
+    <h2 class="kicker" style="border:0">a notice</h2>
+    <div class="rule">
+      <div class="t1" id="t1" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/tease-01.webp"><img src="assets/img/tease-01.png" alt="" loading="lazy"></picture></div>
+      <span class="egg" aria-live="polite">08.17.25</span>
+    </div>
+    <div class="cols redact" aria-hidden="true">
+      <div class="redact"><span style="width:100%"></span><span style="width:88%"></span><span style="width:95%"></span><span style="width:40%"></span></div>
+      <div class="redact"><span style="width:76%"></span><span style="width:100%"></span><span style="width:64%"></span></div>
+      <div class="redact"><span style="width:90%"></span><span style="width:52%"></span></div>
+    </div>
+  </section>
+
+  <section class="sheet" id="elsewhere">
+    <p class="note m" data-mark="§">the shop has shirts and other things you can hold.</p>
+    <div class="wide">
+      <span class="hand elsew" data-hand="H06"><span class="sr-only">elsewhere</span><svg class="hw hw-elsewhere" viewBox="0 0 2208 1452" aria-hidden="true" focusable="false"><use href="assets/hand/elsewhere.svg#h"/></svg></span>
+      <ul class="index">
+        <li><a href="#">spotify</a><span>to listen</span></li>
+        <li><a href="#">apple music</a><span>to listen</span></li>
+        <li><a href="#">bandcamp</a><span>to listen, and help</span></li>
+        <li><a href="#">instagram</a><span>@dearyoutx</span></li>
+        <li><a href="#">tiktok</a><span>@dearyoutx</span></li>
+        <li><a href="#">youtube</a><span>to watch</span></li>
+        <li><a href="#">facebook</a><span>for the older among us</span></li>
+        <li><a href="#">x / twitter</a><span>mostly quiet</span></li>
+        <li id="merch"><a href="https://shop.dearyoutx.com">merch</a><span>shop.dearyoutx.com §</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <svg class="logo" viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+    <p class="hand bottom" data-hand="H07"><span class="sr-only">you found the bottom.</span><svg class="hw hw-you-found-the-bottom" viewBox="0 0 5204 1680" aria-hidden="true" focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg></p>
+    <p class="imprint">printed in beaumont, texas. take one. leave one for someone else.</p>
+  </footer>
+</main>
+
+<script>
+  (function () {
+    var shot = new URLSearchParams(location.search).has("shot");
+    var p = HERO_PHOTO, b = p.base, ss = function (e) { return b + "-1200." + e + " 1200w, " + b + "-2400." + e + " 2400w"; };
+    document.getElementById("hero-photo").innerHTML = '<picture><source type="image/avif" srcset="' + ss("avif") + '" sizes="100vw"><source type="image/webp" srcset="' + ss("webp") + '" sizes="100vw"><img src="' + b + '-1200.jpg" alt="' + p.alt + '" style="object-position:' + p.focus + '" decoding="async"></picture>';
+    var omen = document.getElementById("omen");
+    if ("IntersectionObserver" in window && !shot) new IntersectionObserver(function (es, o) { es.forEach(function (e) { if (e.isIntersecting) { omen.classList.add("peek"); o.disconnect(); } }); }, { rootMargin: "0px 0px -25% 0px" }).observe(omen);
+    else omen.classList.add("peek");
+    var n = 0; document.getElementById("t1").addEventListener("click", function () { if (++n === 3) omen.classList.add("gone"); });
+  })();
+</script>
+</body>
+</html>

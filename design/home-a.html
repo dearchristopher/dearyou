@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you — A · archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<script>
+  window.HERO_PHOTO = { base: "assets/img/band-placeholder", alt: "dear you standing in a sandy clearing in front of a pine treeline", focus: "55% 50%" };
+</script>
+<style>
+  /* A · ARCHIVE — museum catalogue / book plate. Serif, hairlines, enormous margins, rust once (tease-01 is the seal). */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+  body { margin: 0; background: var(--bone-100); color: var(--ink-800); overflow-x: clip;
+         font: 400 1.0625rem/1.65 "EB Garamond", Garamond, Georgia, serif; font-feature-settings: "onum", "liga"; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--ink-900); text-decoration-thickness: 2px; }
+  :focus-visible { outline: 1px solid var(--ink-900); outline-offset: 4px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .logo { display: block; height: auto; fill: currentColor; color: var(--ink-900); }
+  .hand { line-height: 1; color: var(--ink-900); }
+  .hand { display: inline-block; } .hand .hw { display: block; height: 1.5em; width: auto; fill: currentColor; overflow: visible; }
+  .hand .hw-you-found-the-bottom { height: 2.6em; } .hand .hw-elsewhere { height: 1.3em; }
+  .sc { font-variant: small-caps; letter-spacing: .06em; text-transform: lowercase; }
+  .col { margin: 0 1.25rem; max-width: 30rem; }
+  @media (min-width: 900px) { .col { margin-left: 38vw; } }
+  .cap { font-size: .9rem; font-style: italic; color: var(--ink-700); }
+  .cap b { font-style: normal; font-weight: 500; color: var(--ink-900); }
+  hr { border: 0; border-top: 1px solid var(--ink-800); margin: 0; }
+  .numeral { display: block; font-size: .95rem; color: var(--ink-700); margin-bottom: 1.5rem; }
+
+  /* head: book-plate */
+  .plate { display: flex; justify-content: space-between; align-items: flex-start; padding: 2rem 1.25rem 3rem; }
+  .plate .logo { height: 96px; width: auto; }
+  .plate nav { text-align: right; font-size: .95rem; line-height: 1.9; }
+  .plate nav a { text-decoration: none; } .plate nav a:hover { text-decoration: underline; }
+  @media (min-width: 900px) { .plate { padding: 3rem 4vw 5rem; } .plate .logo { height: 150px; } }
+
+  /* full-bleed plate */
+  .bleed { width: 100vw; height: min(78svh, 820px); overflow: hidden; background: var(--ink-900); }
+  .bleed picture, .bleed img { width: 100%; height: 100%; }
+  .bleed img { object-fit: cover; filter: saturate(.5) sepia(.18) contrast(1.05); }
+  .bleed + .cap { padding: .75rem 1.25rem 0; }
+  @media (min-width: 900px) { .bleed + .cap { padding: .9rem 4vw 0; } }
+
+  section { padding-top: clamp(9rem, 22vw, 18rem); }
+  .about p { font-size: clamp(1.35rem, 2.6vw, 1.7rem); line-height: 1.45; margin: 0; color: var(--ink-900); }
+  .about p.fn { font-size: .85rem; line-height: 1.5; color: var(--ink-700); margin-top: 1.25rem; }
+  sup a { text-decoration: none; font-size: .75em; padding: 0 1px; }
+
+  /* recordings */
+  .works { display: grid; gap: 4.5rem; }
+  .work .art { aspect-ratio: 1; overflow: hidden; }
+  .work .art img { width: 100%; height: 100%; object-fit: cover; }
+  .work .cap { margin-top: .9rem; }
+  .work .listen { font-size: .95rem; margin-top: .4rem; }
+  .work.held { width: 52%; }
+  .work.held .art { background: var(--ink-900); display: grid; place-items: start center; }
+  .work.held .t2 { width: 14%; }
+  .work.held .t2 img { width: 100%; height: auto; filter: brightness(0) invert(.88); } /* drip in bone: rust stays a single seal */
+  .bar { display: inline-block; height: .7em; width: 7em; background: var(--ink-900); vertical-align: baseline; }
+
+  /* the rule tease-04 sits on (keep translateY(32%) — he sits, feet dangle) */
+  .ledge { position: relative; border-top: 1px solid var(--ink-800); margin-top: 7rem; }
+  .ledge .t4 { position: absolute; bottom: 100%; right: 12%; height: 58px; margin-bottom: -1px; transform: translateY(32%); }
+  .ledge .t4 img { height: 100%; width: auto; }
+  @media (min-width: 900px) { .ledge .t4 { height: 68px; } }
+
+  /* the seal: tease-01 over a hairline, alone */
+  .omen { padding-top: clamp(12rem, 30vw, 24rem); }
+  .omen .rule { position: relative; border-top: 1px solid var(--ink-800); }
+  .omen .t1 { position: absolute; bottom: 100%; left: 10%; width: 120px; height: 48px; overflow: hidden; margin-bottom: -1px; -webkit-tap-highlight-color: transparent; }
+  .omen .t1 img { width: 100%; height: auto; transform: translateY(100%); transition: transform 3.2s var(--ease-in-out); }
+  .omen.peek .t1 img { transform: translateY(0); }
+  .omen.gone .t1 img { transform: translateY(100%); transition-duration: .4s; }
+  .omen .egg { position: absolute; left: 10%; top: .6rem; font-style: italic; opacity: 0; transition: opacity 1.2s; }
+  .omen.gone .egg { opacity: 1; }
+  .omen .cap { margin-top: 3rem; }
+
+  /* correspondence: footnotes */
+  .notes { list-style: none; padding: 0; margin: 2.5rem 0 0; border-top: 1px solid var(--ink-800); padding-top: 1rem; font-size: .95rem; columns: 2; column-gap: 2rem; }
+  .notes li { break-inside: avoid; padding: .15rem 0; }
+  .notes sup { margin-right: .35rem; color: var(--ink-700); }
+
+  /* colophon */
+  footer { padding: clamp(10rem, 24vw, 20rem) 1.25rem 2.5rem; }
+  footer .wrap { display: grid; gap: 1.5rem; justify-items: start; }
+  footer .logo { width: 180px; }
+  footer .bottom { font-size: 1.2rem; margin: 0; }
+  .colophon { font-size: .8rem; color: var(--ink-700); max-width: 26rem; line-height: 1.5; }
+  @media (min-width: 900px) { footer { padding-left: 38vw; } }
+
+  @media (prefers-reduced-motion: reduce) { .omen .t1 img { transform: none; transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="plate">
+  <h1 class="sr-only">dear you</h1>
+  <svg class="logo" viewBox="0 0 1524 2952" aria-hidden="true"><use href="assets/logo-dearyou.svg#logo"/></svg>
+  <nav aria-label="Primary">
+    <a href="#about"><span class="sc">i.</span> about</a><br>
+    <a href="#listen"><span class="sc">ii.</span> recordings</a><br>
+    <a href="#elsewhere"><span class="sc">iv.</span> correspondence</a><br>
+    <a href="https://shop.dearyoutx.com"><span class="sc">v.</span> objects</a>
+  </nav>
+</header>
+
+<figure style="margin:0">
+  <div class="bleed" id="hero-photo"></div>
+  <figcaption class="cap"><b>pl. 01</b> — the band, in a clearing outside beaumont, texas. photograph, 2025. <span class="sc">[placeholder plate]</span></figcaption>
+</figure>
+
+<section class="about col" id="about">
+  <span class="numeral sc">i. about</span>
+  <p>four friends from beaumont, texas. we stopped for ten years and couldn't stay quiet. we're making the record we always meant to.</p>
+  <p class="fn">placeholder text; the band will write its own.</p>
+</section>
+
+<section class="col" id="listen">
+  <span class="numeral sc">ii. recordings</span>
+  <div class="works">
+    <figure class="work" style="margin:0">
+      <div class="art"><picture>
+        <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="30rem">
+        <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="30rem">
+        <img src="assets/img/fault-line-cover-600.jpg" alt="fault line cover" loading="lazy" decoding="async"></picture></div>
+      <figcaption class="cap"><b>pl. 02</b> — <i>fault line</i>. single, 2026. out now.</figcaption>
+      <div class="listen">hear it: <a href="#">spotify</a> · <a href="#">apple music</a> · <a href="#">bandcamp</a> · <a href="#">youtube</a></div>
+    </figure>
+    <figure class="work held" style="margin:0" aria-label="next single, not yet">
+      <div class="art"><picture class="t2" aria-hidden="true"><source type="image/webp" srcset="assets/img/tease-02.webp"><img src="assets/img/tease-02.png" alt="" loading="lazy"></picture></div>
+      <figcaption class="cap"><b>pl. 03</b> — <span class="bar"></span>. next. not yet catalogued.</figcaption>
+    </figure>
+  </div>
+  <div class="ledge" aria-hidden="true"><picture class="t4"><source type="image/webp" srcset="assets/img/tease-04.webp"><img src="assets/img/tease-04.png" alt="" loading="lazy"></picture></div>
+</section>
+
+<section class="omen col" id="omen" aria-label="something is coming">
+  <div class="rule">
+    <div class="t1" id="t1" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/tease-01.webp"><img src="assets/img/tease-01.png" alt="" loading="lazy"></picture></div>
+    <span class="egg" aria-live="polite">08.17.25</span>
+  </div>
+  <p class="cap"><b>iii.</b> — untitled. forthcoming.</p>
+</section>
+
+<section class="col" id="elsewhere">
+  <span class="numeral sc">iv. correspondence</span>
+  <p>the recordings are held at spotify<sup><a href="#">1</a></sup>, apple music<sup><a href="#">2</a></sup> and bandcamp<sup><a href="#">3</a></sup>, the last of which helps us most. we answer, slowly, at instagram<sup><a href="#">4</a></sup>, tiktok<sup><a href="#">5</a></sup>, youtube<sup><a href="#">6</a></sup>, facebook<sup><a href="#">7</a></sup> and x<sup><a href="#">8</a></sup>. objects<sup><a href="https://shop.dearyoutx.com">9</a></sup> can be had from the shop.</p>
+  <ol class="notes">
+    <li><sup>1</sup><a href="#">spotify</a></li>
+    <li><sup>2</sup><a href="#">apple music</a></li>
+    <li><sup>3</sup><a href="#">bandcamp</a></li>
+    <li><sup>4</sup><a href="#">instagram</a></li>
+    <li><sup>5</sup><a href="#">tiktok</a></li>
+    <li><sup>6</sup><a href="#">youtube</a></li>
+    <li><sup>7</sup><a href="#">facebook</a></li>
+    <li><sup>8</sup><a href="#">x / twitter</a></li>
+    <li id="merch"><sup>9</sup><a href="https://shop.dearyoutx.com">shop.dearyoutx.com</a> <span class="sc">(v. objects)</span></li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+    <p class="hand bottom" data-hand="H07"><span class="sr-only">you found the bottom.</span><svg class="hw hw-you-found-the-bottom" viewBox="0 0 5204 1680" aria-hidden="true" focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg></p>
+    <p class="colophon"><span class="sc">colophon.</span> set in eb garamond. printed on nothing. assembled in beaumont, texas, mmxxvi.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var shot = new URLSearchParams(location.search).has("shot");
+    var p = HERO_PHOTO, b = p.base, ss = function (e) { return b + "-1200." + e + " 1200w, " + b + "-2400." + e + " 2400w"; };
+    document.getElementById("hero-photo").innerHTML = '<picture><source type="image/avif" srcset="' + ss("avif") + '" sizes="100vw"><source type="image/webp" srcset="' + ss("webp") + '" sizes="100vw"><img src="' + b + '-1200.jpg" alt="' + p.alt + '" style="object-position:' + p.focus + '" decoding="async"></picture>';
+    var omen = document.getElementById("omen");
+    if ("IntersectionObserver" in window && !shot) new IntersectionObserver(function (es, o) { es.forEach(function (e) { if (e.isIntersecting) { omen.classList.add("peek"); o.disconnect(); } }); }, { rootMargin: "0px 0px -25% 0px" }).observe(omen);
+    else omen.classList.add("peek");
+    var n = 0; document.getElementById("t1").addEventListener("click", function () { if (++n === 3) omen.classList.add("gone"); });
+  })();
+</script>
+</body>
+</html>

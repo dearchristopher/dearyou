@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# design: raw source photos stay out of git/build
+design/assets/*.png
+design/assets/art/
+design/shots/

@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you</title>
+<meta name="description" content="dear you. pop punk from beaumont, texas." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Special+Elite&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<style>
+  /* =====================================================================
+     v5 · "someone's in the room"  (concept: design/CONCEPTS.md, A)
+     One room. One floor line that never leaves the screen. A guy sits on
+     it the whole way down and is never where you left him.
+     Grammar: above the floor = the room. Below the floor = captions.
+     Motion: transform + opacity only. Scroll progress drives --p per scene.
+     ===================================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bone-100); color: var(--ink-900); overflow-x: clip;
+         font: 400 1rem/1.5 var(--font-body); -webkit-font-smoothing: antialiased; }
+  img, svg { display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--ink-900); color: var(--bone-50); padding: .75rem 1rem; }
+  .skip:focus { top: 1rem; }
+
+  :root {
+    --floor: 78svh;          /* the floor line, from the top of the viewport. every scene obeys it. */
+    --gx: 1.25rem;           /* edge gutter */
+    --guy-h: 64px;
+    --ease: cubic-bezier(.22, .8, .2, 1);   /* squarespace-ish: fast out, long settle */
+  }
+  @media (min-width: 900px) { :root { --gx: 2.5rem; --guy-h: 96px; } }
+
+  .logo svg, svg.logo { fill: currentColor; }
+  .hw { display: block; height: 1em; width: auto; fill: currentColor; overflow: visible; }
+
+  /* ---------- lights: a fixed ink layer that fades in for the dark scene ---------- */
+  .lights { position: fixed; inset: 0; background: var(--ink-900); opacity: 0; transition: opacity .9s var(--ease-in-out); pointer-events: none; z-index: 0; }
+  body[data-tone="ink"] .lights { opacity: 1; }
+
+  /* ---------- the stage: floor + guy. fixed, above scenes, never clickable ---------- */
+  .stage { position: fixed; inset: 0; pointer-events: none; z-index: 6; color: var(--ink-900); }
+  body[data-tone="ink"] .stage { color: var(--bone-200); }
+  .floor { position: absolute; left: 0; right: 0; top: var(--floor); height: 1px; background: currentColor;
+           transform-origin: 0 50%; transform: scaleX(var(--draw, 1)); transition: opacity .5s var(--ease); }
+  .stage[data-floor="0"] .floor { opacity: 0; }
+  .guy { position: absolute; top: var(--floor); left: 0; height: 0; transform: translateX(var(--gxp, 50vw));
+         opacity: 1; transition: opacity .45s var(--ease); }
+  .guy i { position: absolute; bottom: 0; left: 0; height: var(--guy-h); aspect-ratio: 161 / 300; background: currentColor;
+           -webkit-mask: url(assets/img/tease-04.png) center / contain no-repeat; mask: url(assets/img/tease-04.png) center / contain no-repeat;
+           transform: translateY(32%); }   /* loved: sits ON the rule, feet dangling below it */
+  .stage[data-guy="off"] .guy, .guy.blink { opacity: 0; }
+
+  /* ---------- scenes ---------- */
+  .scene { position: relative; z-index: 1; }
+  .pin { height: var(--len, 220svh); }
+  .pin > .view { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .below { position: absolute; left: var(--gx); right: var(--gx); top: calc(var(--floor) + 1.1rem); }
+  .cap { margin: 0; font-size: var(--text-sm); line-height: 1.45; color: var(--ink-700); max-width: 30rem; }
+  .cap b { color: var(--ink-900); font-weight: 700; }
+  .draft { font-size: .6875rem; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--ink-600); }
+  .fade { opacity: 0; transform: translateY(.6rem); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .fade.on { opacity: 1; transform: none; }
+
+  /* 1 · hero: full-bleed photo shrinks into a window on the wall ------------- */
+  .hero { --len: 230svh; }
+  .hero .photo { position: absolute; inset: 0; background: var(--ink-900); transform-origin: 50% 50%; will-change: transform; }
+  .hero .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; filter: saturate(.55) contrast(1.04); }
+  .hero .photo::after { content: ""; position: absolute; inset: 0; background: var(--ink-900); opacity: .3; }
+  .hero .logo { position: absolute; left: var(--gx); bottom: 6svh; height: 54svh; width: auto; max-width: 64vw; color: var(--bone-50); will-change: transform, opacity; }
+  .hero .logo svg { height: 100%; width: auto; }
+  .hero nav { position: absolute; top: .5rem; right: calc(var(--gx) - .75rem); display: flex; color: var(--bone-50); will-change: opacity; }
+  .hero nav a { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: .5rem .75rem; font-size: 2.4rem; }
+  .hero nav a:hover { color: var(--rust-300); }
+  .hero .where { position: absolute; top: 1.15rem; left: var(--gx); margin: 0; font-size: var(--text-xs); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--bone-200); will-change: opacity; }
+  .hero .said { margin: 0; font-weight: 700; font-size: clamp(1.5rem, 4.4vw, 2.6rem); line-height: 1.05; letter-spacing: var(--tracking-tight); color: var(--ink-900); }
+  @media (min-width: 900px) { .hero .logo { bottom: 7svh; height: 76svh; } .hero nav { top: 1.5rem; } .hero nav a { font-size: 3rem; } .hero .where { top: 2.4rem; } }
+
+  /* 2 · about: giant blurb, words fill in as you scroll ------------------------ */
+  .about { --len: 230svh; }
+  .about .blurb { position: absolute; left: var(--gx); right: var(--gx); top: 11svh; margin: 0; max-width: 17ch;
+                  font-weight: 800; font-size: clamp(2.1rem, 11.6vw, 6.2rem); line-height: .96; letter-spacing: -0.035em; }
+  .about .blurb span { opacity: .12; transition: opacity .25s linear; }
+  .about .blurb span.lit { opacity: 1; }
+  @media (min-width: 900px) { .about .blurb { max-width: 21ch; font-size: clamp(3rem, 5.6vw, 6rem); top: 12svh; } }
+
+  /* 3 · fault line: the record on the floor swallows the room ----------------- */
+  .fault { --len: 280svh; }
+  .fault .cover { position: absolute; left: 0; top: 0; width: var(--S); height: var(--S); will-change: transform; transform-origin: 0 0; }
+  .fault .cover img { width: 100%; height: 100%; object-fit: cover; }
+  .fault .bar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--ink-900); color: var(--bone-50);
+                padding: 1.25rem var(--gx) calc(1.25rem + env(safe-area-inset-bottom)); transform: translateY(101%); transition: transform .9s var(--ease); }
+  .fault.open .bar { transform: none; }
+  .fault .bar-in { display: grid; gap: .75rem 2rem; align-items: end; }
+  .fault .title { display: flex; align-items: end; gap: 1rem; }
+  .fault .title h2 { margin: 0; font-weight: 800; font-size: clamp(2.4rem, 10vw, 5.5rem); line-height: .9; letter-spacing: -0.04em; }
+  .fault .title .hw { height: clamp(2.6rem, 9vw, 4.6rem); color: var(--rust-300); margin-bottom: -.3rem; }
+  .fault .meta { margin: 0; font-size: var(--text-sm); color: var(--bone-300); }
+  .links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.25rem; }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; font-size: var(--text-md); text-decoration: none; border-bottom: 1px solid transparent; }
+  .links a:hover { border-bottom-color: currentColor; }
+  .fault .links a { color: var(--bone-50); }
+  .fault .links a.bc { color: var(--rust-300); }
+  .fault .stagger > * { opacity: 0; transform: translateY(.8rem); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(.35s + var(--i) * 70ms); }
+  .fault.open .stagger > * { opacity: 1; transform: none; }
+  @media (min-width: 900px) { .fault .bar-in { grid-template-columns: auto 1fr; } .fault .bar-in .links { justify-content: flex-end; } }
+
+  /* 4 · not yet: lights off. the drip lowers onto an empty slot --------------- */
+  .notyet { --len: 230svh; color: var(--bone-50); }
+  .notyet .next { position: absolute; left: var(--gx); top: 9svh; margin: 0; font-weight: 800; font-size: clamp(5.5rem, 30vw, 17rem); line-height: .8; letter-spacing: -0.05em; }
+  .notyet .slot { position: absolute; right: 14vw; top: calc(var(--floor) - var(--slot)); width: var(--slot); height: var(--slot); background: var(--ink-800); --slot: min(34vw, 30svh); }
+  .notyet .drip { position: absolute; top: 0; right: calc(14vw + var(--slot) / 2 - var(--dw) / 2); width: var(--dw); --dw: clamp(22px, 4vw, 44px);
+                  height: calc(var(--floor) - var(--slot) - 1.5svh); overflow: hidden; --slot: min(34vw, 30svh); }
+  .notyet .dr { position: absolute; inset: 0; transform: translateY(var(--dy, -100%)); will-change: transform; }
+  .notyet .dr i { position: absolute; left: 0; bottom: 0; width: 100%; aspect-ratio: 200 / 680; background: var(--rust-500);
+                  -webkit-mask: url(assets/img/tease-02.png) center / 100% 100% no-repeat; mask: url(assets/img/tease-02.png) center / 100% 100% no-repeat; }
+  .notyet .dr b { position: absolute; top: 0; left: 41%; width: 13.5%; bottom: calc(var(--dw) * 3.4 - 2px); background: var(--rust-500); }  /* the stem, all the way up to the ceiling */
+  .notyet .cap { color: var(--bone-300); }
+  .notyet .cap b { color: var(--bone-50); font-size: var(--text-lg); display: block; letter-spacing: var(--tracking-tight); }
+  .notyet .draft { color: var(--bone-300); }
+
+  /* 5 · horns: something behind the floor. stare and it sinks ---------------- */
+  .horns { --len: 250svh; }
+  .horns .pit { position: absolute; left: 58vw; top: calc(var(--floor) - var(--hh)); width: calc(var(--hh) * 2.5); height: var(--hh); overflow: hidden;
+                --hh: clamp(64px, 10vw, 140px); padding: 0; border: 0; background: none; cursor: default; -webkit-tap-highlight-color: transparent; }
+  .horns .pit i { position: absolute; inset: 0; background: var(--rust-500);
+                  -webkit-mask: url(assets/img/tease-01.png) center / contain no-repeat; mask: url(assets/img/tease-01.png) center / contain no-repeat;
+                  transform: translateY(var(--hy, 100%)); transition: transform .7s var(--ease); will-change: transform; }
+  .horns.shy .pit i { transition-duration: 2.6s; }
+  .horns.gone .pit i { transform: translateY(101%); transition-duration: .35s; }
+  .horns .date { font-family: var(--font-letter); font-size: var(--text-lg); color: var(--rust-600); margin: 0 0 .5rem; opacity: 0; transition: opacity 1.4s var(--ease) .3s; }
+  .horns.gone .date { opacity: 1; }
+  .horns .pit { left: 42vw; }
+  @media (min-width: 900px) { .horns .pit { left: 52vw; } }
+
+  /* 6 · elsewhere: the room empties out into a list -------------------------- */
+  .else { padding: 16svh var(--gx) 10svh; display: grid; gap: 4.5rem; }
+  .else h2 { margin: 0 0 1rem; color: var(--ink-900); }
+  .else h2 .hw { height: clamp(2.6rem, 7vw, 4.2rem); }
+  .else .hint { margin: 0 0 1.25rem; font-size: var(--text-sm); color: var(--ink-700); }
+  .big { list-style: none; margin: 0; padding: 0; }
+  .big li { overflow: hidden; padding-bottom: .06em; }
+  .big a { display: inline-block; min-height: 44px; min-width: 44px; font-weight: 800; font-size: clamp(2.6rem, 12vw, 7.2rem); line-height: .95; letter-spacing: -0.045em; text-decoration: none;
+           transform: translateY(105%); transition: transform 1s var(--ease), color .2s; transition-delay: calc(var(--i) * 80ms), 0s; }
+  .big.on a { transform: none; }
+  .big a:hover { color: var(--rust-600); }
+  .big a.bc { color: var(--rust-600); }
+  .big a.bc:hover { color: var(--rust-700); }
+  .big.small a { font-size: clamp(1.9rem, 7vw, 4.2rem); }
+  @media (min-width: 900px) { .else { grid-template-columns: 1.25fr 1fr; align-items: start; gap: 2rem; } }
+
+  /* 7 · merch: one rust circle, bleeding off the edge ------------------------ */
+  .merch { position: relative; height: 110svh; overflow: hidden; }
+  .merch a { position: absolute; top: 10svh; right: -18vw; width: var(--d); height: var(--d); --d: min(108vw, 78svh); border-radius: 50%;
+             background: var(--rust-500); color: var(--bone-50); display: grid; place-items: center; text-decoration: none;
+             transform: scale(var(--ms, .08)); will-change: transform; }
+  .merch a .hw { height: calc(var(--d) * .26); transform: translateX(-9%); }
+  .merch a:hover { background: var(--rust-600); }
+  .merch a:focus-visible { outline-offset: 8px; }
+  .merch .cap { position: absolute; left: var(--gx); bottom: 12svh; }
+  @media (min-width: 900px) { .merch a { right: -6vw; } }
+
+  /* 8 · the bottom: the room again. someone else is here now ----------------- */
+  .end { position: relative; height: 100svh; overflow: hidden; }
+  .end .logo { position: absolute; left: var(--gx); top: calc(var(--floor) - 1.5rem - var(--lh)); height: var(--lh); width: auto; --lh: min(54vw, 46svh); color: var(--ink-900); margin-top: calc(-1 * var(--guy-h)); }
+  .end .ghost { position: absolute; top: var(--floor); left: 70vw; height: 0; }
+  .end .ghost svg { position: absolute; bottom: -1px; left: 0; height: calc(var(--guy-h) * 1.55); width: auto; color: var(--bone-200);
+                    opacity: 0; transition: opacity 3.2s var(--ease-in-out); }
+  .end.seen .ghost svg { opacity: 1; }
+  .end .hw.bottom { height: clamp(2.2rem, 6vw, 3.6rem); color: var(--ink-700); margin-bottom: .5rem; }
+  .end .tiny { display: flex; justify-content: space-between; gap: 1rem; font-size: var(--text-xs); color: var(--ink-700); margin: 0; }
+  @media (min-width: 900px) { .end .ghost { left: 74vw; } .end .logo { --lh: min(36vw, 58svh); margin-top: 0; } }
+
+  /* ---------- reduced motion: no pinning, everything at rest ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .pin { height: auto; }
+    .pin > .view { position: relative; }
+    .fade, .fault .stagger > *, .big a { opacity: 1; transform: none; transition: none; }
+    .about .blurb span { opacity: 1; }
+    .guy, .floor, .lights, .horns .pit i, .end .ghost svg, .fault .bar { transition: none; }
+    .merch a { transform: none; }
+  }
+</style>
+</head>
+<body data-tone="bone">
+<a class="skip" href="#listen">skip to the music</a>
+<h1 class="sr-only">dear you</h1>
+
+<div class="lights" aria-hidden="true"></div>
+
+<!-- the stage: one floor, one guy. present (almost) the whole way down. -->
+<div class="stage" id="stage" data-floor="0" data-guy="off" aria-hidden="true">
+  <div class="floor" id="floor"></div>
+  <div class="guy" id="guy"><i></i></div>
+</div>
+
+<main>
+  <!-- 1 · HERO --------------------------------------------------------- -->
+  <section class="scene pin hero" id="s-hero" data-guy="58" data-guy-m="74" data-floor="draw" aria-label="dear you">
+    <div class="view">
+      <div class="photo" id="photo">
+        <picture>
+          <source type="image/avif" srcset="assets/img/band-placeholder-1200.avif 1200w, assets/img/band-placeholder-2400.avif 2400w" sizes="100vw">
+          <source type="image/webp" srcset="assets/img/band-placeholder-1200.webp 1200w, assets/img/band-placeholder-2400.webp 2400w" sizes="100vw">
+          <img src="assets/img/band-placeholder-1200.jpg" alt="two of the band standing apart in a sandy clearing in front of pine trees" decoding="async" fetchpriority="high">
+        </picture>
+      </div>
+      <p class="where" id="where">beaumont, texas</p>
+      <nav aria-label="Primary" id="nav">
+        <a href="#listen" aria-label="listen"><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
+        <a href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+      </nav>
+      <div class="logo" id="logo"><svg viewBox="0 0 1524 2952" aria-hidden="true" focusable="false"><use href="assets/logo-dearyou.svg#logo"/></svg></div>
+      <div class="below">
+        <!-- DRAFT copy -->
+        <p class="said fade" id="said">we were gone a while.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · ABOUT -------------------------------------------------------- -->
+  <section class="scene pin about" id="s-about" data-guy="74" data-floor="1" aria-labelledby="about-h">
+    <div class="view">
+      <h2 class="sr-only" id="about-h">about</h2>
+      <!-- DRAFT copy: placeholder until the band writes its own -->
+      <p class="blurb" id="blurb">four friends from beaumont, texas. we stopped for ten years. we never stopped thinking about it. this is what came out.</p>
+      <div class="below"><p class="cap"><span class="draft">draft · the band will write its own</span></p></div>
+    </div>
+  </section>
+
+  <!-- 3 · FAULT LINE --------------------------------------------------- -->
+  <section class="scene pin fault" id="s-fault" data-guy="16" data-floor="1" aria-labelledby="fl-h">
+    <div class="view">
+      <div class="cover" id="cover">
+        <picture>
+          <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="100vmax">
+          <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="100vmax">
+          <img src="assets/img/fault-line-cover-1200.jpg" alt="fault line cover art" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <div class="bar">
+        <div class="bar-in stagger">
+          <div class="title" style="--i:0">
+            <h2 id="fl-h">fault line</h2>
+            <svg class="hw" viewBox="0 0 2000 1512" role="img" aria-label="out now" focusable="false"><use href="assets/hand/out-now.svg#h"/></svg>
+          </div>
+          <ul class="links" style="--i:1">
+            <li><a class="bc" href="https://dearyoutx.bandcamp.com">bandcamp</a></li>
+            <li><a href="#" data-todo="spotify fault line url">spotify</a></li>
+            <li><a href="#" data-todo="apple music fault line url">apple music</a></li>
+            <li><a href="#" data-todo="youtube fault line url">youtube</a></li>
+          </ul>
+          <p class="meta" style="--i:2">single, 2026. it's on the record.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · NEXT. NOT YET. ----------------------------------------------- -->
+  <section class="scene pin notyet" id="s-notyet" data-guy="20" data-floor="1" data-tone="ink" aria-labelledby="ny-h">
+    <div class="view">
+      <h2 class="next" id="ny-h">next.</h2>
+      <div class="slot" aria-hidden="true"></div>
+      <div class="drip" aria-hidden="true"><div class="dr" id="drip"><b></b><i></i></div></div>
+      <div class="below">
+        <!-- DRAFT copy. Silk & Gold stays unnamed and uncovered until confirmed. -->
+        <p class="cap fade" id="ny-cap"><b>not yet.</b>it's finished. it's just not time. <span class="draft">· draft</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · HORNS -------------------------------------------------------- -->
+  <section class="scene pin horns" id="s-horns" data-guy="10" data-floor="1" aria-label="something behind the floor">
+    <div class="view">
+      <button class="pit" id="pit" type="button" aria-label="something behind the floor"><i></i></button>
+      <div class="below">
+        <p class="date" aria-live="polite" id="date"></p>
+        <!-- DRAFT copy -->
+        <p class="cap fade" id="h-cap">don't mind him. he's always been here. <span class="draft">· draft</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · ELSEWHERE ---------------------------------------------------- -->
+  <section class="scene else" id="listen" data-guy="off" data-floor="0" aria-label="listen and find us">
+    <div>
+      <h2><span class="sr-only">listen</span><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></h2>
+      <p class="hint">bandcamp helps us the most.</p>
+      <ul class="big" data-reveal>
+        <li><a class="bc" style="--i:0" href="https://dearyoutx.bandcamp.com">bandcamp</a></li>
+        <li><a style="--i:1" href="#" data-todo="spotify artist url">spotify</a></li>
+        <li><a style="--i:2" href="#" data-todo="apple music artist url">apple music</a></li>
+        <li><a style="--i:3" href="https://www.youtube.com/@dearyoutx">youtube</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2><span class="sr-only">elsewhere</span><svg class="hw" viewBox="0 0 2208 1452" aria-hidden="true" focusable="false"><use href="assets/hand/elsewhere.svg#h"/></svg></h2>
+      <p class="hint">we answer. slowly.</p>
+      <ul class="big small" data-reveal>
+        <li><a style="--i:0" href="https://www.instagram.com/dearyoutx">instagram</a></li>
+        <li><a style="--i:1" href="https://www.tiktok.com/@dearyoutx" data-todo="confirm tiktok handle">tiktok</a></li>
+        <li><a style="--i:2" href="https://www.facebook.com/dearyoutx" data-todo="confirm facebook url">facebook</a></li>
+        <li><a style="--i:3" href="https://x.com/DearYouTX">x</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7 · MERCH -------------------------------------------------------- -->
+  <section class="scene merch" id="s-merch" data-guy="off" data-floor="0" aria-label="merch">
+    <a href="https://shop.dearyoutx.com" id="merch-dot"><span class="sr-only">merch, at shop.dearyoutx.com</span><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+    <p class="cap">shirts and things you can hold.<br><b>shop.dearyoutx.com</b></p>
+  </section>
+</main>
+
+<!-- 8 · THE BOTTOM ----------------------------------------------------- -->
+<footer class="scene end" id="s-end" data-guy="62" data-guy-m="48" data-floor="1">
+  <svg class="logo" viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+  <div class="ghost" aria-hidden="true">
+    <svg viewBox="0 0 180 170"><path fill="currentColor" d="M98 3C78 3 68 19 67 41c-1 21-5 40-13 58-10 22-25 41-45 57-6 5-9 9-9 12v2h180c-3-7-10-14-18-25-15-21-28-48-32-79-2-18-5-32-10-42C114 9 107 3 98 3Z"/></svg>
+  </div>
+  <div class="below">
+    <svg class="hw bottom" viewBox="0 0 5204 1680" role="img" aria-label="you found the bottom." focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg>
+    <p class="tiny"><span>© dear you 2026</span><span>beaumont, texas</span></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var body = document.body, stage = document.getElementById("stage"), guy = document.getElementById("guy"), floor = document.getElementById("floor");
+  var $ = function (id) { return document.getElementById(id); };
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var seg = function (p, a, b) { return clamp((p - a) / (b - a), 0, 1); };          // remap p over [a,b]
+  var ease = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+  var scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
+  var vw, vh, fy;                                                                   // viewport + floor y (px)
+
+  function measure() {
+    vw = innerWidth; vh = innerHeight;
+    fy = parseFloat(getComputedStyle(floor).top);
+  }
+
+  // pinned-scene progress: 0 when it pins, 1 when it unpins
+  function prog(el) {
+    var r = el.getBoundingClientRect(), run = r.height - vh;
+    return run > 0 ? clamp(-r.top / run, 0, 1) : (r.top <= 0 ? 1 : 0);
+  }
+
+  // ---- split the blurb into words for the scrub ----
+  var blurb = $("blurb"), words = [];
+  blurb.innerHTML = blurb.textContent.trim().split(/\s+/).map(function (w) { return "<span>" + w + "</span>"; }).join(" ");
+  words = blurb.querySelectorAll("span");
+
+  // ---- the guy never walks. he's just somewhere else when you look back ----
+  var guyAt = null, guyTimer;
+  function placeGuy(x) {
+    if (x === guyAt) return;
+    var first = guyAt === null || guyAt === "off";
+    guyAt = x;
+    stage.dataset.guy = x === "off" ? "off" : "on";
+    if (x === "off") return;
+    if (first || reduce) { guy.style.setProperty("--gxp", x + "vw"); return; }
+    guy.classList.add("blink");
+    clearTimeout(guyTimer);
+    guyTimer = setTimeout(function () { guy.style.setProperty("--gxp", x + "vw"); guy.classList.remove("blink"); }, 480);
+  }
+
+  // ---- horns: rise with scroll, sink when you stare, 3 pokes = a date ----
+  var horns = $("s-horns"), pit = $("pit"), pokes = 0, stareTimer;
+  pit.addEventListener("click", function () {
+    if (++pokes === 3) { horns.classList.add("gone"); $("date").textContent = "08.17.25"; }
+  });
+
+  // ---- the ghost only shows up for people who stay at the bottom ----
+  var end = $("s-end"), ghostTimer;
+
+  var active = null, frame = 0;
+  function update() {
+    frame = 0;
+    var mid = vh * .5, cur = null;
+    for (var i = 0; i < scenes.length; i++) {
+      var r = scenes[i].getBoundingClientRect();
+      if (r.top <= mid && r.bottom > mid) { cur = scenes[i]; break; }
+    }
+    if (!cur) cur = scenes[scenes.length - 1].getBoundingClientRect().top < mid ? scenes[scenes.length - 1] : scenes[0];
+
+    var p, t;
+
+    // 1 · hero: photo → window, logo lifts, floor draws, he arrives
+    p = reduce ? 0 : prog($("s-hero"));
+    t = ease(seg(p, 0, .62));
+    var s = 1 - (vw < 900 ? .5 : .6) * t;                                        // final window scale
+    var ty = (fy - vh * .07 - vh / 2 - s * vh / 2) * t;                            // window bottom settles just above the floor
+    var tx = (vw < 900 ? 0 : vw * -.16) * t;
+    $("photo").style.transform = "translate3d(" + tx + "px," + ty + "px,0) scale(" + s + ")";
+    $("logo").style.transform = "translate3d(0," + (-seg(p, 0, .4) * vh * .25) + "px,0)";
+    $("logo").style.opacity = 1 - seg(p, .05, .32);
+    $("nav").style.opacity = $("where").style.opacity = 1 - seg(p, .05, .2);
+    $("said").classList.toggle("on", p > .72 || reduce);
+
+    // 2 · about: words light up in reading order
+    p = reduce ? 1 : prog($("s-about"));
+    var n = Math.round(seg(p, .08, .8) * words.length);
+    for (var w = 0; w < words.length; w++) words[w].classList.toggle("lit", w < n);
+
+    // 3 · fault line: small record on the floor → full bleed → ink bar
+    var fault = $("s-fault");
+    p = reduce ? 1 : prog(fault);
+    var S = Math.max(vw, vh);                                                      // square that covers the viewport at full size
+    var s0 = Math.min(vw * (vw < 900 ? .46 : .3), vh * .36) / S;
+    var x0 = vw * (vw < 900 ? .46 : .56), y0 = fy - s0 * S;                       // standing on the floor
+    var x1 = (vw - S) / 2, y1 = (vh - S) / 2;
+    t = ease(seg(p, .1, .62));
+    var cs = s0 + (1 - s0) * t;
+    fault.style.setProperty("--S", S + "px");
+    $("cover").style.transform = "translate3d(" + (x0 + (x1 - x0) * t) + "px," + (y0 + (y1 - y0) * t) + "px,0) scale(" + cs + ")";
+    fault.classList.toggle("open", p > .7);
+
+    // 4 · not yet: the drip lowers
+    p = reduce ? 1 : prog($("s-notyet"));
+    $("drip").style.setProperty("--dy", (-100 + 100 * ease(seg(p, .05, .75))) + "%");
+    $("ny-cap").classList.toggle("on", p > .55 || reduce);
+
+    // 5 · horns: rise from behind the floor
+    p = reduce ? 1 : prog(horns);
+    if (!horns.classList.contains("shy")) horns.style.setProperty("--hy", (100 - 100 * ease(seg(p, .12, .7))) + "%");
+    $("h-cap").classList.toggle("on", p > .78 || reduce);
+
+    // 7 · merch: dot grows into a circle as it comes up
+    var mr = $("s-merch").getBoundingClientRect();
+    $("merch-dot").style.setProperty("--ms", reduce ? 1 : (.08 + .92 * ease(seg(1 - mr.top / vh, .1, .85))).toFixed(4));
+
+    // ---- stage state from the active scene ----
+    var d = cur.dataset, gx = (vw < 900 && d.guyM) || d.guy;
+    body.dataset.tone = d.tone || "bone";
+    if (cur.id === "s-hero") {
+      var hp = reduce ? 0 : prog(cur);
+      floor.style.setProperty("--draw", ease(seg(hp, .35, .7)).toFixed(4));
+      stage.dataset.floor = hp > .35 ? "1" : "0";
+      placeGuy(hp > .72 ? gx : "off");
+    } else {
+      floor.style.setProperty("--draw", 1);
+      var off = cur.id === "s-fault" && prog(cur) > .12;                         // the record swallows the room
+      stage.dataset.floor = off ? "0" : d.floor;
+      placeGuy(off ? "off" : gx);
+    }
+
+    if (cur !== active) {
+      active = cur;
+      clearTimeout(ghostTimer);
+      if (cur === end) ghostTimer = setTimeout(function () { end.classList.add("seen"); }, reduce ? 0 : 1400);
+    }
+
+    // stare at the horns (stop scrolling) and they go back down
+    clearTimeout(stareTimer);
+    horns.classList.remove("shy");
+    if (cur === horns && !reduce) stareTimer = setTimeout(function () {
+      horns.classList.add("shy"); horns.style.setProperty("--hy", "100%");
+    }, 4200);
+  }
+
+  function onScroll() { if (!frame) frame = requestAnimationFrame(update); }
+
+  // reveal-on-enter for the big link lists
+  var lists = document.querySelectorAll("[data-reveal]");
+  if ("IntersectionObserver" in window && !reduce) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -15% 0px" });
+    lists.forEach(function (l) { io.observe(l); });
+  } else lists.forEach(function (l) { l.classList.add("on"); });
+
+  // he moves when you're not looking. literally: leave the tab, come back, he's moved.
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden || guyAt === null || guyAt === "off") return;
+    var x = Math.round(8 + Math.random() * 78);
+    guy.style.setProperty("--gxp", x + "vw"); guyAt = String(x);
+  });
+
+  measure(); update();
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", function () { measure(); onScroll(); });
+})();
+</script>
+</body>
+</html>
