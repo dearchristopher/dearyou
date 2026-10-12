@@ -669,9 +669,13 @@
     var vw = innerWidth, vh = innerHeight, wide = vw >= 900;
     var bx = photo.offsetLeft, by = photo.offsetTop, bw = photo.offsetWidth, bh = photo.offsetHeight, fy = hfloor.offsetTop;
     var tw = vw * (wide ? .36 : .6), th = tw * bh / bw, tx = vw - (wide ? 40 : 20) - tw, ty = fy - vh * (wide ? .05 : .065) - th;
-    var lr = logo.offsetTop, lh = logo.offsetHeight, ly = wide ? (fy - vh * .04) - (lr + lh) : (vh * .085) - lr;
+    /* settled: the logo still spills over the photo window. wide: ~20% of the mark crosses its left edge, hanging just below it.
+       narrow: it straddles the window's top edge (below it is the floor line). */
+    var lr = logo.offsetTop, lh = logo.offsetHeight, lx = logo.offsetLeft, lw = logo.offsetWidth, gx = wide ? 40 : 20, ly, dx = 0;
+    if (wide) { ly = (ty + th + vh * .03) - (lr + lh); dx = Math.max(gx, tx + lw * .2 - lw) - lx; }
+    else { ly = (ty + lh * .35) - (lr + lh); dx = Math.max(0, tx + lw * .25 - (lx + lw)); }   /* tablets: make sure it actually crosses */
     T = TS.map(function (t) { return "translate3d(" + (tx - bx) * t + "px," + (ty - by) * t + "px,0) scale(" + (1 + (tw / bw - 1) * t) + ")"; });
-    L = TS.map(function (t) { return "translate3d(0," + ly * t + "px,0)"; });
+    L = TS.map(function (t) { return "translate3d(" + dx * t + "px," + ly * t + "px,0)"; });
   }
   function setStage(k, quiet) {
     var prev = stage; stage = k;
