@@ -9,6 +9,7 @@ mkdirSync(OUT, { recursive: true })
 for (const f of readdirSync(OUT)) rmSync(join(OUT, f), { recursive: true, force: true }) // empty, keep the dir
 
 let html = readFileSync(join(SRC, PAGE), 'utf8')
+const extra = new Set()
 const SITE = 'https://dearyoutx.com'
 const meta = `
 <link rel="canonical" href="${SITE}/" />
@@ -23,10 +24,15 @@ const meta = `
 <meta name="twitter:image" content="${SITE}/assets/img/og-1200x630.jpg" />`
 html = html.replace('<meta name="theme-color"', meta.trim() + '\n<meta name="theme-color"')
 html = html.replace(/content="dear you\. pop punk from beaumont, texas\."/, 'content="little pop punk band from big texas, with a lot to say."')
+// players: a release only gets a play bar once its file is in design/assets/audio/
+html = html.replace(/\s*<div class="play" data-audio="([^"]+)"[^>]*><\/div>/g, (m, f) => {
+  if (existsSync(join(SRC, f))) { extra.add(f); return m }
+  console.log(`[build-site] no ${f} yet: player left out`); return ''
+})
 writeFileSync(join(OUT, 'index.html'), html)
 
 // every local file referenced by the page (src, srcset, href, url()), minus #fragments
-const refs = new Set(['tokens.css', 'assets/img/og-1200x630.jpg'])
+const refs = new Set(['tokens.css', 'assets/img/og-1200x630.jpg', ...extra])
 const re = /(?:src|href)="([^"]+)"|srcset="([^"]+)"|url\(([^)]+)\)/g
 for (const m of html.matchAll(re)) {
   const vals = m[2] ? m[2].split(',').map((s) => s.trim().split(/\s+/)[0]) : [m[1] || m[3]]

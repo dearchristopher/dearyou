@@ -27,3 +27,6 @@ dist-ssr
 design/assets/*.png
 design/assets/art/
 design/shots/
+
+# unreleased audio: never in the public repo before release day
+design/assets/audio/silk-and-gold*
