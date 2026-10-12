@@ -297,18 +297,18 @@
   /* ---- hero player: fixed to the bottom from first paint, so anyone can hit play in under 2s ---- */
   .hp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: .9rem;
         padding: .45rem var(--gx) calc(.45rem + env(safe-area-inset-bottom)); background: var(--night-900); border-top: 1px solid rgba(226, 223, 208, .45); }
-  .hp .play { margin: 0; flex: 1; max-width: 46rem; }
+  .hp .play { margin: 0; flex: 1; min-width: 0; max-width: 46rem; }
   /* next: a quiet icon, not a second play block. .play button / .play.on button would paint it bone-on-bone */
   .hp .play button.nx, .hp .play.on button.nx { flex: none; width: 44px; height: 44px; border: 0; padding: 0; margin-left: -.5rem; background: none; color: var(--bone-100); cursor: pointer; display: grid; place-items: center; }
   .hp .play button.nx:hover { background: none; color: var(--rust-300); }
   .hp .play button.nx:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
   .hp .play button.nx svg { width: 15px; height: 15px; fill: currentColor; }
-  .hp-l { flex: none; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
-  .hp-n { font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
+  .hp-l { flex: 0 1 auto; min-width: 0; max-width: 40%; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
+  .hp-n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
   .hp-m { font-size: .8125rem; font-weight: 400; color: var(--rust-300); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
   .hp-l:hover .hp-m { color: var(--color-accent-hover); }
   body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
-  @media (max-width: 599px) { .hp .play .bar { min-width: 3rem; } .hp-m { font-size: .75rem; } }
+  @media (max-width: 599px) { .hp .play { gap: .6rem; } .hp .play .bar { min-width: 2.5rem; } .hp .play .t { min-width: 0; } .hp-n { font-size: 1rem; } .hp-m { font-size: .75rem; } }
 </style>
 </head>
 <body>
@@ -549,7 +549,7 @@
       x.b.after(nx);
       hp.insertBefore(l, x.bar);   /* [play] [next] [title / all the links] [progress] [time] */
       hpUI = {
-        bind: function () { nm.textContent = cur.name; x.bar.setAttribute("aria-label", cur.name + " position"); paint(x, cur); tick(x, cur); },
+        bind: function () { nm.textContent = cur.name; l.title = cur.name; x.bar.setAttribute("aria-label", cur.name + " position"); paint(x, cur); tick(x, cur); },
         ui: function () { paint(x, cur); }, time: function () { tick(x, cur); }
       };
       wire(x, function () { return cur; });
