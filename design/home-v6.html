@@ -123,7 +123,7 @@
   .hero .view { position: sticky; top: 0; height: 100svh; overflow: hidden; --floor: 78svh; }
   .hero .photo { position: absolute; left: 0; top: 0; width: 100%; height: 70svh; background: var(--night-900); transform-origin: 0 0; will-change: transform; }
   .hero .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 56% 50%; }   /* 56%: keeps both members in frame from 360 to 1600 */
-  .hero .logo { position: absolute; left: var(--gx); top: calc(70svh + 1.25rem); height: 19svh; width: auto; color: var(--bone-100); will-change: transform; }
+  .hero .logo { position: absolute; z-index: 2; left: var(--gx); top: calc(70svh - 19svh * .35); height: 19svh; width: auto; color: var(--bone-100); will-change: transform; }   /* spills over the photo's bottom edge */
   .hero .logo .stack { display: none; }
   .hero .wall { position: absolute; right: var(--gx); top: calc(70svh + .75rem); display: grid; justify-items: end; gap: .1rem; will-change: opacity; }
   .hero .wall nav { display: flex; }
@@ -141,7 +141,7 @@
                 font-weight: 300; font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.3; color: var(--bone-100); }
   @media (min-width: 900px) {
     .hero .photo { left: 25vw; width: 75vw; height: 100svh; }
-    .hero .logo { top: auto; bottom: 6svh; height: min(37vw, 60svh); }
+    .hero .logo { --lh: min(37vw, 60svh); top: auto; bottom: 6svh; height: var(--lh); left: max(var(--gx), calc(25vw - var(--lh) * .5163 * .8)); }   /* spills over the photo's left edge, every width */
     .hero .logo .stack { display: block; } .hero .logo .horiz { display: none; }
     .hero .wall { right: auto; left: calc(var(--gx) - .4rem); top: 1.25rem; justify-items: start; }
     .hero .wall nav a { font-size: 2.6rem; }
