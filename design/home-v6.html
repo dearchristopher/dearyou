@@ -298,10 +298,11 @@
   .hp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: .9rem;
         padding: .45rem var(--gx) calc(.45rem + env(safe-area-inset-bottom)); background: var(--night-900); border-top: 1px solid rgba(226, 223, 208, .45); }
   .hp .play { margin: 0; flex: 1; max-width: 46rem; }
-  .hp .nx { flex: none; width: 44px; height: 44px; border: 0; padding: 0; background: none; color: var(--bone-100); cursor: pointer; display: grid; place-items: center; margin-left: -.5rem; }
-  .hp .nx:hover { color: var(--rust-300); }
-  .hp .nx:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
-  .hp .nx svg { width: 15px; height: 15px; fill: currentColor; }
+  /* next: a quiet icon, not a second play block. .play button / .play.on button would paint it bone-on-bone */
+  .hp .play button.nx, .hp .play.on button.nx { flex: none; width: 44px; height: 44px; border: 0; padding: 0; margin-left: -.5rem; background: none; color: var(--bone-100); cursor: pointer; display: grid; place-items: center; }
+  .hp .play button.nx:hover { background: none; color: var(--rust-300); }
+  .hp .play button.nx:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
+  .hp .play button.nx svg { width: 15px; height: 15px; fill: currentColor; }
   .hp-l { flex: none; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
   .hp-n { font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
   .hp-m { font-size: .8125rem; font-weight: 400; color: var(--rust-300); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
