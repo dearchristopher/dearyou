@@ -298,6 +298,10 @@
   .hp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: .9rem;
         padding: .45rem var(--gx) calc(.45rem + env(safe-area-inset-bottom)); background: var(--night-900); border-top: 1px solid rgba(226, 223, 208, .45); }
   .hp .play { margin: 0; flex: 1; max-width: 46rem; }
+  .hp .nx { flex: none; width: 44px; height: 44px; border: 0; padding: 0; background: none; color: var(--bone-100); cursor: pointer; display: grid; place-items: center; margin-left: -.5rem; }
+  .hp .nx:hover { color: var(--rust-300); }
+  .hp .nx:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
+  .hp .nx svg { width: 15px; height: 15px; fill: currentColor; }
   .hp-l { flex: none; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
   .hp-n { font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
   .hp-m { font-size: .8125rem; font-weight: 400; color: var(--rust-300); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
@@ -480,7 +484,7 @@
      preload none: nothing downloads until play. one track at a time. */
   (function () {
     var P = '<path d="M3 1.5v13l11-6.5z"/>', Z = '<path d="M3 1.5h3.6v13H3zM9.4 1.5H13v13H9.4z"/>';
-    var tracks = {}, all = [], cur = null, hpUI = null;
+    var tracks = {}, all = [], cur = null, hpUI = null, order = [];
     function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
     function track(src, name, dur) {
       if (tracks[src]) return tracks[src];
@@ -488,7 +492,8 @@
       var tr = tracks[src] = { a: a, name: name, dur: dur, uis: [] };
       function sync() { tr.uis.forEach(function (u) { u.ui(); }); if (hpUI && cur === tr) hpUI.ui(); }
       a.onplay = function () { all.forEach(function (o) { if (o !== a) o.pause(); }); if (cur !== tr) { cur = tr; if (hpUI) hpUI.bind(); } sync(); };
-      a.onpause = a.onended = sync;
+      a.onpause = sync;
+      a.onended = function () { sync(); if (cur === tr) next(true); };   /* roll into the next song */
       a.ontimeupdate = function () { tr.uis.forEach(function (u) { u.time(); }); if (hpUI && cur === tr) hpUI.time(); };
       return tr;
     }
@@ -519,7 +524,18 @@
       var tr = track(el.getAttribute("data-audio"), name, dur), x = shell(el, name, dur);
       tr.uis.push({ ui: function () { paint(x, tr); }, time: function () { tick(x, tr); } });
       wire(x, function () { return tr; });
+      order.push({ tr: tr, el: el });
     });
+    // next: page order, skipping players that are hidden right now (e.g. the teaser once the full song is up)
+    function next(auto) {
+      var list = order.filter(function (o) { return o.el.offsetParent !== null; })
+                      .map(function (o) { return o.tr; })
+                      .filter(function (t, i, l) { return l.indexOf(t) === i; });
+      if (!list.length) return;
+      var i = list.indexOf(cur), n = list[(i + 1) % list.length];
+      if (auto && i === list.length - 1) return;   /* stop after the last song instead of looping */
+      n.a.currentTime = 0; n.a.play();
+    }
     // bottom bar: starts on the newest release (silk & gold once its full song is up, else fault line)
     var hp = document.querySelector("#hp .play");
     if (hp) {
@@ -527,7 +543,11 @@
       var start = sgFull ? tracks[sgFull.getAttribute("data-audio")] : tracks[hp.getAttribute("data-audio")] || track(hp.getAttribute("data-audio"), "fault line", "4:08");
       cur = start;
       var x = shell(hp, cur.name, cur.dur), nm = document.querySelector("#hp .hp-n"), l = document.querySelector("#hp .hp-l");
-      hp.insertBefore(l, x.bar);   /* [play] [title / all the links] [progress] [time] */
+      var nx = document.createElement("button"); nx.type = "button"; nx.className = "nx"; nx.setAttribute("aria-label", "next song");
+      nx.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2v12l8.5-6z"/><path d="M11 2h3v12h-3z"/></svg>';
+      nx.onclick = function () { next(false); };
+      x.b.after(nx);
+      hp.insertBefore(l, x.bar);   /* [play] [next] [title / all the links] [progress] [time] */
       hpUI = {
         bind: function () { nm.textContent = cur.name; x.bar.setAttribute("aria-label", cur.name + " position"); paint(x, cur); tick(x, cur); },
         ui: function () { paint(x, cur); }, time: function () { tick(x, cur); }
