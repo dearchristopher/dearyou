@@ -30,11 +30,6 @@
   --rust-600: #A3402A;  /* rust button fill / rust text on bone (AA) */
   --rust-700: #85331F;  /* hover / pressed */
 
-  /* CAMPAIGN (silk & gold, temporary): gold is release dressing only, never UI. drop with the campaign */
-  --gold-300: #E8C873;  /* highlight bead */
-  --gold-500: #C99A3E;  /* BASE gold: the pour */
-  --gold-700: #8E6A26;  /* shadow side of a drop */
-
   /* ---- Color: semantic -------------------------------------------------- */
   --color-bg:            var(--bone-100);
   --color-bg-raised:     var(--bone-100);  /* flat: nothing is raised */
