@@ -25,7 +25,7 @@ const meta = `
 html = html.replace('<meta name="theme-color"', meta.trim() + '\n<meta name="theme-color"')
 html = html.replace(/content="dear you\. pop punk from beaumont, texas\."/, 'content="little pop punk band from big texas, with a lot to say."')
 // players: a release only gets a play bar once its file is in design/assets/audio/
-html = html.replace(/\s*<div class="play" data-audio="([^"]+)"[^>]*><\/div>/g, (m, f) => {
+html = html.replace(/\s*<div class="play[^"]*" data-audio="([^"]+)"[^>]*><\/div>/g, (m, f) => {
   if (existsSync(join(SRC, f))) { extra.add(f); return m }
   console.log(`[build-site] no ${f} yet: player left out`); return ''
 })

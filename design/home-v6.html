@@ -25,7 +25,6 @@
       localStorage.setItem("dyx-seen", String(Date.now()));
     } catch (e) {}
     var ret = q === "1" ? false : q === "0" ? true : seen;
-    try { if (sessionStorage.getItem("dyx-replay")) { sessionStorage.removeItem("dyx-replay"); history.scrollRestoration = "manual"; scrollTo(0, 0); } } catch (e) {}
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) ret = true;   /* no intro for reduced motion */
     document.documentElement.classList.add(ret ? "ret" : "first");
   })();
@@ -130,12 +129,7 @@
   .hero .wall nav { display: flex; }
   .hero .wall nav a { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: .25rem .4rem; font-size: 1.9rem; }
   .hero .wall nav a:hover { color: var(--rust-300); }
-  .been { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .25rem; border: 0; background: none; color: var(--muted);
-          font: 400 var(--text-sm)/1.2 var(--font-body); cursor: pointer; max-width: 8.5rem; text-align: right; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-  .been:hover { color: var(--rust-300); }
   .ret .hero .wall { display: none; }
-  .replay { display: none; position: absolute; left: calc(var(--gx) - .25rem); top: calc(var(--floor) + 1.1rem + 2.6rem); max-width: none; text-align: left; }
-  .ret .replay { display: inline-flex; }
   .hero .floor { position: absolute; left: 0; right: 0; top: var(--floor); color: var(--bone-200); }
   .hero .floor::before { transition: none; }
   .hero .sent { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; }
@@ -150,7 +144,7 @@
     .hero .logo { top: auto; bottom: 6svh; height: min(37vw, 60svh); }
     .hero .logo .stack { display: block; } .hero .logo .horiz { display: none; }
     .hero .wall { right: auto; left: calc(var(--gx) - .4rem); top: 1.25rem; justify-items: start; }
-    .hero .wall nav a { font-size: 2.6rem; } .been { text-align: left; max-width: none; }
+    .hero .wall nav a { font-size: 2.6rem; }
     .hero .guy { --x: 34vw; }
   }
 
@@ -283,7 +277,8 @@
   .play .fill { position: absolute; left: 0; top: calc(50% - 2px); height: 4px; width: 0; background: var(--bone-100); }
   .play .t { flex: none; min-width: 4.6em; text-align: right; font-size: .8125rem; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
   .play.on button { background: var(--bone-100); }
-  #sg:not(.released) .play { display: none; }
+  #sg:not(.released) .play.full { display: none; }
+  #sg.released .full ~ .tease { display: none; }   /* teaser until the full song is up */
   /* music video: a still until clicked, then youtube loads (no youtube scripts before that) */
   .vid { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; margin: 1.6rem 0 0; padding: 0; border: 0; background: var(--night-800); cursor: pointer; overflow: hidden; }
   .vid img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -298,10 +293,26 @@
   .earlier .m { margin-left: .6rem; font-size: var(--text-sm); color: var(--muted); }
   .earlier .m a { color: var(--rust-300); font-weight: 400; }
   .earlier .play { margin-top: .3rem; }
+
+  /* ---- hero player: fixed to the bottom from first paint, so anyone can hit play in under 2s ---- */
+  .hp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: .9rem;
+        padding: .45rem var(--gx) calc(.45rem + env(safe-area-inset-bottom)); background: var(--night-900); border-top: 1px solid rgba(226, 223, 208, .45); }
+  .hp .play { margin: 0; flex: 1; max-width: 46rem; }
+  .hp-l { flex: none; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
+  .hp-n { font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
+  .hp-m { font-size: .8125rem; font-weight: 400; color: var(--rust-300); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .hp-l:hover .hp-m { color: var(--color-accent-hover); }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  @media (max-width: 599px) { .hp .play .bar { min-width: 3rem; } .hp-m { font-size: .75rem; } }
 </style>
 </head>
 <body>
 <a class="skiplink" href="#listen">skip to the music</a>
+<!-- hero player: there on first paint, every visit. same audio as the players under "listen" -->
+<div class="hp" id="hp" role="region" aria-label="player">
+  <div class="play" data-audio="assets/audio/fault-line.mp3" data-title="fault line" data-dur="4:08"></div>
+  <a class="hp-l" href="#listen"><span class="hp-n">fault line</span><span class="hp-m">all the links</span></a>
+</div>
 <h1 class="sr-only">dear you</h1>
 
 <!-- quick nav: always there on a return visit; slides in after the intro on a first visit -->
@@ -334,13 +345,9 @@
           <a href="#listen" aria-label="listen"><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
           <a href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
         </nav>
-        <!-- DRAFT copy: the odd skip -->
-        <button class="been" id="been" type="button">i've been here before.</button>
       </div>
       <div class="floor" id="hero-floor"><i class="guy" data-x="46vw" data-xm="78vw"></i></div>
       <p class="said" id="said">i must confess, what a mess.</p>
-      <!-- DRAFT copy: return view only. clears dyx-seen and replays the intro -->
-      <button class="been replay" id="replay" type="button">show me the weird version again.</button>
     </div>
   </section>
 
@@ -382,7 +389,8 @@
         <ul class="links rv" style="--i:5">
           <li><a href="https://sl.cmdshft.com/silkandgold"><span class="sg-pre">pre-order</span><span class="sg-out">listen</span></a></li>
         </ul>
-        <div class="play" data-audio="assets/audio/silk-and-gold.mp3" data-title="silk &amp; gold"></div>
+        <div class="play full" data-audio="assets/audio/silk-and-gold.mp3" data-title="silk &amp; gold"></div>
+        <div class="play tease" data-audio="assets/audio/sg-teaser.mp3" data-title="silk &amp; gold teaser" data-dur="teaser · 0:18"></div>
       </li>
     </ul>
     <!-- earlier singles: all on the record. plain list, a play bar each -->
@@ -457,26 +465,54 @@
 </footer>
 
 <script>
-  /* players: one at a time; plain <audio>, preload none so nothing downloads until play */
+  /* silk & gold: flips from pre-order to out now at local midnight on release day */
+  (function () {
+    var el = document.getElementById("sg"); if (!el) return;
+    var d = el.getAttribute("data-release").split("-");
+    var q = new URLSearchParams(location.search).get("released");
+    var out = q === "1" ? true : q === "0" ? false : Date.now() >= new Date(+d[0], d[1] - 1, +d[2]).getTime();
+    if (out) el.classList.add("released");
+  })();
+</script>
+<script>
+  /* players: one Audio per track, shared by every UI showing it (hero bar + the one under "listen").
+     preload none: nothing downloads until play. one track at a time. */
   (function () {
     var P = '<path d="M3 1.5v13l11-6.5z"/>', Z = '<path d="M3 1.5h3.6v13H3zM9.4 1.5H13v13H9.4z"/>';
-    var all = [];
+    var tracks = {}, all = [];
     function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
+    function track(src) {
+      if (tracks[src]) return tracks[src];
+      var a = new Audio(); a.preload = "none"; a.src = src; all.push(a);
+      var tr = tracks[src] = { a: a, uis: [] };
+      function each(f) { tr.uis.forEach(f); }
+      a.onplay = a.onpause = a.onended = function () { each(function (u) { u.ui(); }); };
+      a.ontimeupdate = function () { each(function (u) { u.time(); }); };
+      return tr;
+    }
+    // after 10.23 the hero plays silk & gold, once its full song is on the site
+    var hp = document.querySelector("#hp .play"), sgFull = document.querySelector("#sg.released .play.full");
+    if (hp && sgFull) {
+      hp.setAttribute("data-audio", sgFull.getAttribute("data-audio")); hp.setAttribute("data-title", "silk & gold"); hp.removeAttribute("data-dur");
+      document.querySelector("#hp .hp-n").textContent = "silk & gold";
+    }
     document.querySelectorAll(".play[data-audio]").forEach(function (el) {
-      var a = new Audio(); a.preload = "none"; a.src = el.getAttribute("data-audio");
-      var name = el.getAttribute("data-title");
+      var tr = track(el.getAttribute("data-audio")), a = tr.a, name = el.getAttribute("data-title"), dur = el.getAttribute("data-dur") || "";
       el.innerHTML = '<button type="button" aria-label="play ' + name + '"><svg viewBox="0 0 16 16" aria-hidden="true">' + P + '</svg></button>' +
-        '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + (el.getAttribute("data-dur") || "") + '</span>';
+        '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + dur + '</span>';
       var b = el.querySelector("button"), bar = el.querySelector(".bar"), fill = el.querySelector(".fill"), t = el.querySelector(".t");
-      all.push(a);
-      function ui() { var on = !a.paused; el.classList.toggle("on", on); b.firstChild.innerHTML = on ? Z : P; b.setAttribute("aria-label", (on ? "pause " : "play ") + name); }
+      tr.uis.push({
+        ui: function () { var on = !a.paused; el.classList.toggle("on", on); b.firstChild.innerHTML = on ? Z : P; b.setAttribute("aria-label", (on ? "pause " : "play ") + name); },
+        time: function () { var pc = a.duration ? a.currentTime / a.duration * 100 : 0; fill.style.width = pc + "%"; bar.setAttribute("aria-valuenow", Math.round(pc)); t.textContent = fmt(a.currentTime) + " / " + fmt(a.duration); }
+      });
       b.onclick = function () { if (a.paused) { all.forEach(function (o) { if (o !== a) o.pause(); }); a.play(); } else a.pause(); };
-      a.onplay = a.onpause = a.onended = ui;
-      a.ontimeupdate = function () { var pc = a.duration ? a.currentTime / a.duration * 100 : 0; fill.style.width = pc + "%"; bar.setAttribute("aria-valuenow", Math.round(pc)); t.textContent = fmt(a.currentTime) + " / " + fmt(a.duration); };
       function seek(f) { if (a.duration) a.currentTime = Math.min(1, Math.max(0, f)) * a.duration; }
-      bar.onclick = function (e) { var r = bar.getBoundingClientRect(); if (a.paused && !a.duration) { a.play(); a.addEventListener("loadedmetadata", function () { seek((e.clientX - r.left) / r.width); }, { once: true }); } else seek((e.clientX - r.left) / r.width); };
+      bar.onclick = function (e) { var r = bar.getBoundingClientRect(), f = (e.clientX - r.left) / r.width;
+        if (!a.duration) { all.forEach(function (o) { if (o !== a) o.pause(); }); a.play(); a.addEventListener("loadedmetadata", function () { seek(f); }, { once: true }); } else seek(f); };
       bar.onkeydown = function (e) { if (!a.duration) return; if (e.key === "ArrowRight") a.currentTime += 5; else if (e.key === "ArrowLeft") a.currentTime -= 5; else return; e.preventDefault(); };
     });
+    // hero bar layout: [play] [title / all the links] [progress] [time]
+    if (hp) { var l = document.querySelector("#hp .hp-l"); hp.insertBefore(l, hp.querySelector(".bar")); }
     document.querySelectorAll(".vid[data-yt]").forEach(function (v) {
       v.onclick = function () {
         all.forEach(function (o) { o.pause(); });
@@ -486,16 +522,6 @@
         var box = document.createElement("div"); box.className = "vid"; box.appendChild(f); v.replaceWith(box);
       };
     });
-  })();
-</script>
-<script>
-  /* silk & gold: flips from pre-order to out now at local midnight on release day */
-  (function () {
-    var el = document.getElementById("sg"); if (!el) return;
-    var d = el.getAttribute("data-release").split("-");
-    var q = new URLSearchParams(location.search).get("released");
-    var out = q === "1" ? true : q === "0" ? false : Date.now() >= new Date(+d[0], d[1] - 1, +d[2]).getTime();
-    if (out) el.classList.add("released");
   })();
 </script>
 <script>
@@ -714,20 +740,6 @@
   // ---- 3 pokes at the horns = a date ----
   var pokes = 0;
   $("pit").addEventListener("click", function () { if (++pokes === 3) { lit.classList.add("gone"); $("date").textContent = "08.17.25"; } });
-
-  // ---- "i've been here before." skips the intro for good ----
-  $("been").addEventListener("click", function () {
-    try { localStorage.setItem("dyx-seen", String(Date.now())); } catch (e) {}
-    root.classList.remove("first"); root.classList.add("ret");
-    setStage(4);
-    $("listen").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-  });
-
-  $("replay").addEventListener("click", function () {
-    try { localStorage.removeItem("dyx-seen"); sessionStorage.setItem("dyx-replay", "1"); } catch (e) {}
-    var u = new URL(location.href); u.searchParams.delete("first"); u.hash = "";
-    location.replace(u.toString()); scrollTo(0, 0);
-  });
 
   // ---- he moves when you're not looking. leave the tab, come back, he's somewhere else ----
   document.addEventListener("visibilitychange", function () {
