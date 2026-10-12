@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you — B · gallery wall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<script>
+  window.HERO_PHOTO = { base: "assets/img/band-placeholder", alt: "dear you standing in a sandy clearing in front of a pine treeline", focus: "55% 50%" };
+</script>
+<style>
+  /* B · GALLERY WALL — Swiss-flat. One element per screen, huge bleeds, long silences, tiny wall labels bottom-left. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+  body { margin: 0; background: var(--bone-100); color: var(--ink-900); overflow-x: clip;
+         font: 400 1rem/1.5 "Archivo", "Helvetica Neue", Arial, sans-serif; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--rust-600); }
+  :focus-visible { outline: 2px solid var(--ink-900); outline-offset: 4px; }
+  .photo :focus-visible { outline-color: var(--bone-50); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .logo { display: block; height: auto; fill: currentColor; }
+  .hand { line-height: 1; text-decoration: none; }
+  .hand { display: inline-block; } .hand .hw { display: block; height: 1.5em; width: auto; fill: currentColor; overflow: visible; }
+  .hand .hw-you-found-the-bottom { height: 2.6em; } .hand .hw-elsewhere { height: 1.3em; }
+
+  /* a "screen" = one wall. min-height keeps the silence. */
+  .wall { position: relative; min-height: 100svh; }
+  .gap { height: 40svh; }            /* silence between walls */
+  .label { position: absolute; left: 1.25rem; bottom: 1.25rem; font-size: .75rem; line-height: 1.45; max-width: 18rem; color: var(--ink-700); }
+  .label b { font-weight: 700; color: var(--ink-900); display: block; }
+  @media (min-width: 900px) { .label { left: 2.5rem; bottom: 2.5rem; } }
+
+  /* wall 1: the photo, full viewport */
+  .photo { background: var(--ink-900); overflow: hidden; height: 100svh; color: var(--bone-50); }
+  .photo picture, .photo img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .photo img { object-fit: cover; filter: saturate(.5) sepia(.18) contrast(1.05) brightness(.92); }
+  .photo .logo { position: absolute; left: 1.25rem; bottom: 4.5rem; height: 36svh; width: auto; color: var(--bone-50); }
+  .photo nav { position: absolute; top: 1.25rem; right: 1.25rem; display: flex; gap: 1.5rem; }
+  .photo nav a { color: var(--bone-50); font-size: 1.3rem; }
+  .photo .label { color: var(--bone-200); }
+  .photo .label b { color: var(--bone-50); }
+  @media (min-width: 900px) { .photo .logo { left: 2.5rem; bottom: 2.5rem; height: 48svh; } .photo nav { top: 2.5rem; right: 2.5rem; gap: 2.5rem; } .photo .label { left: auto; right: 2.5rem; text-align: right; } }
+
+  /* wall 2: about, small, low right */
+  .about .blurb { position: absolute; right: 1.25rem; bottom: 22svh; margin: 0; width: min(100% - 2.5rem, 24rem); font-size: 1.25rem; line-height: 1.4; font-weight: 500; }
+  @media (min-width: 900px) { .about .blurb { right: 12vw; } }
+
+  /* wall 3: fault line, huge and off-center */
+  .fl .art { position: absolute; top: 12svh; right: 1.25rem; width: 78vw; aspect-ratio: 1; }
+  .fl .art img { width: 100%; height: 100%; object-fit: cover; }
+  .fl .out { position: absolute; top: calc(12svh - 2.2rem); right: 1.25rem; font-size: 1.5rem; }
+  .fl .label a { margin-right: .6rem; }
+  @media (min-width: 900px) { .fl .art { width: min(58svh, 46vw); right: 14vw; top: 14svh; } .fl .out { right: 14vw; top: calc(14svh - 2.4rem); } }
+
+  /* wall 4: next. not yet. — small, top-left, alone */
+  .next .art { position: absolute; top: 10svh; left: 1.25rem; width: 34vw; max-width: 180px; aspect-ratio: 1; background: var(--ink-900); display: grid; place-items: start center; }
+  .next .t2 { width: 14%; } .next .t2 img { width: 100%; height: auto; }
+  @media (min-width: 900px) { .next .art { left: 2.5rem; } }
+
+  /* the rule tease-04 sits on (keep translateY(32%)) — full-bleed rule */
+  .ledge { position: relative; border-top: 1px solid var(--ink-800); width: 100vw; }
+  .ledge .t4 { position: absolute; bottom: 100%; left: 62%; height: 56px; margin-bottom: -1px; transform: translateY(32%); }
+  .ledge .t4 img { height: 100%; width: auto; }
+
+  /* wall 5: tease-01 alone in an empty screen */
+  .omen .rule { position: absolute; left: 0; right: 0; top: 62%; border-top: 1px solid var(--ink-800); }
+  .omen .t1 { position: absolute; bottom: 100%; left: 50%; translate: -50% 0; width: 110px; height: 44px; overflow: hidden; margin-bottom: -1px; -webkit-tap-highlight-color: transparent; }
+  .omen .t1 img { width: 100%; height: auto; transform: translateY(100%); transition: transform 3.2s var(--ease-in-out); }
+  .omen.peek .t1 img { transform: translateY(0); }
+  .omen.gone .t1 img { transform: translateY(100%); transition-duration: .4s; }
+  .omen .egg { position: absolute; left: 50%; translate: -50% 0; top: .75rem; font-size: .8rem; letter-spacing: .1em; opacity: 0; transition: opacity 1.2s; }
+  .omen.gone .egg { opacity: 1; }
+
+  /* wall 6: elsewhere — one block of big type, bottom-left */
+  .else .list { position: absolute; left: 1.25rem; bottom: 6rem; right: 1.25rem; display: grid; gap: 2.5rem; }
+  .else ul { list-style: none; margin: 0; padding: 0; }
+  .else li a { font-weight: 700; font-size: clamp(1.8rem, 6vw, 3.6rem); line-height: 1.05; letter-spacing: -0.02em; text-decoration: none; }
+  .else li a:hover { text-decoration: underline; }
+  .else .tiny { font-size: .75rem; color: var(--ink-700); margin-bottom: .5rem; }
+  @media (min-width: 900px) { .else .list { left: 2.5rem; bottom: 8rem; grid-template-columns: 1fr 1fr; } }
+
+  /* wall 7: merch, a short wall */
+  .merch { min-height: 60svh; }
+  .merch a { position: absolute; right: 1.25rem; top: 20%; text-align: right; text-decoration: none; }
+  .merch .hand { font-size: 2.2rem; display: block; }
+  .merch .tiny { font-size: .75rem; color: var(--ink-700); }
+  .merch a:hover .tiny { color: var(--rust-600); text-decoration: underline; }
+  @media (min-width: 900px) { .merch a { right: 14vw; } }
+
+  /* footer: the horizontal logo, bled to the edges */
+  footer { padding: 0 0 1.25rem; overflow: hidden; }
+  footer .logo { width: 104vw; margin-left: -2vw; color: var(--ink-900); }
+  footer .row { display: flex; justify-content: space-between; align-items: end; padding: 1rem 1.25rem 0; font-size: .75rem; color: var(--ink-700); }
+  footer .bottom { font-size: 1.15rem; color: var(--ink-700); margin: 0; }
+  @media (min-width: 900px) { footer .row { padding: 1.5rem 2.5rem 1rem; } }
+
+  @media (prefers-reduced-motion: reduce) { .omen .t1 img { transform: none; transition: none; } }
+</style>
+</head>
+<body>
+<h1 class="sr-only">dear you</h1>
+
+<section class="wall photo" aria-label="dear you">
+  <div id="hero-photo"></div>
+  <nav aria-label="Primary">
+    <a class="hand" data-hand="H01" href="#about" aria-label="about"><svg class="hw hw-about" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></a>
+    <a class="hand" data-hand="H02" href="#listen" aria-label="listen"><svg class="hw hw-listen" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
+    <a class="hand" data-hand="H04" href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw hw-merch" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+  </nav>
+  <svg class="logo" viewBox="0 0 1524 2952" aria-hidden="true"><use href="assets/logo-dearyou.svg#logo"/></svg>
+  <p class="label"><b>dear you</b>beaumont, texas. photograph, 2025.<br>[placeholder photograph]</p>
+</section>
+
+<div class="gap"></div>
+
+<section class="wall about" id="about">
+  <p class="blurb">four friends from beaumont, texas. we stopped for ten years and couldn't stay quiet. we're making the record we always meant to.</p>
+  <p class="label"><b>about</b>placeholder text. the band will write its own.</p>
+</section>
+
+<section class="wall fl" id="listen">
+  <span class="hand out" data-hand="H05" aria-hidden="true"><svg class="hw hw-out-now" viewBox="0 0 2000 1512" aria-hidden="true" focusable="false"><use href="assets/hand/out-now.svg#h"/></svg></span>
+  <div class="art"><picture>
+    <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="(min-width:900px) 46vw, 78vw">
+    <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="(min-width:900px) 46vw, 78vw">
+    <img src="assets/img/fault-line-cover-600.jpg" alt="fault line cover" loading="lazy" decoding="async"></picture></div>
+  <p class="label"><b>fault line</b>single, 2026. out now.<br><a href="#">spotify</a><a href="#">apple music</a><a href="#">bandcamp</a><a href="#">youtube</a></p>
+</section>
+
+<section class="wall next" aria-label="next single, not yet" style="min-height:70svh">
+  <div class="art"><picture class="t2" aria-hidden="true"><source type="image/webp" srcset="assets/img/tease-02.webp"><img src="assets/img/tease-02.png" alt="" loading="lazy"></picture></div>
+  <p class="label"><b>untitled</b>next. not yet.</p>
+</section>
+
+<div class="ledge" aria-hidden="true"><picture class="t4"><source type="image/webp" srcset="assets/img/tease-04.webp"><img src="assets/img/tease-04.png" alt="" loading="lazy"></picture></div>
+
+<div class="gap"></div>
+
+<section class="wall omen" id="omen" aria-label="something is coming">
+  <div class="rule">
+    <div class="t1" id="t1" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/tease-01.webp"><img src="assets/img/tease-01.png" alt="" loading="lazy"></picture></div>
+    <span class="egg" aria-live="polite">08.17.25</span>
+  </div>
+</section>
+
+<div class="gap"></div>
+
+<section class="wall else" id="elsewhere">
+  <div class="list">
+    <div><p class="tiny">hear it (bandcamp helps us most)</p>
+      <ul><li><a href="#">spotify</a></li><li><a href="#">apple music</a></li><li><a href="#">bandcamp</a></li></ul></div>
+    <div><p class="tiny">find us</p>
+      <ul><li><a href="#">instagram</a></li><li><a href="#">tiktok</a></li><li><a href="#">youtube</a></li><li><a href="#">facebook</a></li><li><a href="#">x / twitter</a></li></ul></div>
+  </div>
+  <p class="label"><b>elsewhere</b></p>
+</section>
+
+<section class="wall merch" id="merch">
+  <a href="https://shop.dearyoutx.com"><span class="hand" data-hand="H04"><span class="sr-only">merch</span><svg class="hw hw-merch" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></span><span class="tiny">shirts and things you can hold → shop.dearyoutx.com</span></a>
+</section>
+
+<footer>
+  <svg class="logo" viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+  <div class="row"><p class="hand bottom" data-hand="H07"><span class="sr-only">you found the bottom.</span><svg class="hw hw-you-found-the-bottom" viewBox="0 0 5204 1680" aria-hidden="true" focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg></p><span>© dear you 2026</span></div>
+</footer>
+
+<script>
+  (function () {
+    var shot = new URLSearchParams(location.search).has("shot");
+    var p = HERO_PHOTO, b = p.base, ss = function (e) { return b + "-1200." + e + " 1200w, " + b + "-2400." + e + " 2400w"; };
+    document.getElementById("hero-photo").innerHTML = '<picture><source type="image/avif" srcset="' + ss("avif") + '" sizes="100vw"><source type="image/webp" srcset="' + ss("webp") + '" sizes="100vw"><img src="' + b + '-1200.jpg" alt="' + p.alt + '" style="object-position:' + p.focus + '" decoding="async"></picture>';
+    var omen = document.getElementById("omen");
+    if ("IntersectionObserver" in window && !shot) new IntersectionObserver(function (es, o) { es.forEach(function (e) { if (e.isIntersecting) { omen.classList.add("peek"); o.disconnect(); } }); }, { rootMargin: "0px 0px -25% 0px" }).observe(omen);
+    else omen.classList.add("peek");
+    var n = 0; document.getElementById("t1").addEventListener("click", function () { if (++n === 3) omen.classList.add("gone"); });
+  })();
+</script>
+</body>
+</html>

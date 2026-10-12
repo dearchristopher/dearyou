@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dear You — Style Tile v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: var(--weight-regular) var(--text-base)/var(--leading-body) var(--font-body);
+  }
+  /* paper grain over everything, never intercepts clicks */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background-image: var(--grain); opacity: var(--grain-opacity); mix-blend-mode: multiply;
+  }
+  .wrap { max-width: var(--container); margin: 0 auto; padding: 0 var(--gutter); }
+  .tile-section { padding: var(--space-8) 0; border-top: var(--border-hairline); }
+  .label {
+    font: var(--weight-medium) var(--text-xs)/1 var(--font-body);
+    letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-text-muted);
+    margin: 0 0 var(--space-5);
+  }
+  .label b { color: var(--color-accent-text); font-weight: var(--weight-bold); }
+  a { color: var(--color-accent-text); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+  a:hover { color: var(--color-accent-hover); }
+  :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+
+  /* ink-edge filter target: roughens edges like a worn screen */
+  .inked { filter: url(#ink-edge); }
+
+  /* ---------- logo ---------- */
+  .logo { display: block; height: 64px; width: auto; fill: currentColor; color: var(--color-text-strong); }
+
+  /* ---------- nav ---------- */
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+         padding: var(--space-5) 0; border-bottom: var(--border-heavy); }
+  .nav ul { display: flex; gap: var(--space-5); list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .nav a { font: var(--weight-bold) var(--text-xs)/1 var(--font-ui); text-transform: uppercase; letter-spacing: var(--tracking-caps);
+           color: var(--color-text); text-decoration: none; padding: var(--space-1) 0; border-bottom: 3px solid transparent;
+           transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+  .nav a:hover, .nav a[aria-current] { border-color: var(--color-accent); color: var(--color-text-strong); }
+  .nav .date { font-family: var(--font-letter); font-size: var(--text-sm); color: var(--color-text-muted); }
+
+  /* ---------- palette ---------- */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-4); }
+  .sw { border: var(--border-hairline); background: var(--color-bg-raised); }
+  .sw .chip { height: 88px; border-bottom: var(--border-hairline); display: flex; align-items: flex-end; padding: var(--space-2);
+              font: var(--text-lg)/1 var(--font-letter); }
+  .sw .meta { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); line-height: 1.4; }
+  .sw .meta strong { display: block; font-size: var(--text-sm); }
+  .ratio { display: flex; height: 22px; border: var(--border-hairline); margin-top: var(--space-5); }
+  .ratio span { display: block; }
+
+  /* ---------- type ---------- */
+  .display-1 { font: var(--text-3xl)/1.05 var(--font-letter); margin: 0;
+               color: var(--color-text-strong); letter-spacing: var(--tracking-display);
+               text-shadow: 3px 3px 0 var(--color-accent); } /* misregistration */
+  .h1 { font: var(--text-2xl)/1.1 var(--font-letter); margin: 0; }
+  .h2 { font: var(--text-xl)/1.15 var(--font-letter); margin: 0; }
+  .h3 { font: var(--weight-bold) var(--text-xl)/var(--leading-snug) var(--font-body); margin: 0; }
+  .h4 { font: var(--weight-bold) var(--text-md)/var(--leading-snug) var(--font-body); margin: 0; }
+  .letter { font: var(--text-md)/1.55 var(--font-letter); max-width: var(--measure); color: var(--color-text); }
+  .body { max-width: var(--measure); }
+  .small { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .eyebrow { font: var(--weight-bold) var(--text-xs)/1 var(--font-body); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-accent-text); }
+  .scale-row { display: grid; grid-template-columns: 7rem 1fr; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px dashed var(--color-border-subtle); }
+  .scale-row code { font-size: var(--text-xs); color: var(--color-text-muted); }
+
+  /* ---------- buttons ---------- */
+  .row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+         font: var(--weight-bold) var(--text-sm)/1 var(--font-ui); text-transform: uppercase; letter-spacing: var(--tracking-caps);
+         padding: var(--space-3) var(--space-5); border: var(--border-heavy); border-radius: var(--radius-1);
+         text-decoration: none; transition: transform var(--dur-instant) var(--ease-out), box-shadow var(--dur-instant) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+  .btn-primary { background: var(--rust-600); color: var(--bone-50); border-color: var(--ink-900); box-shadow: var(--shadow-print); }
+  .btn-primary:hover { background: var(--rust-700); color: var(--bone-50); }
+  .btn-secondary { background: var(--color-bg-raised); color: var(--color-text-strong); box-shadow: var(--shadow-print-rust); }
+  .btn-secondary:hover { background: var(--color-bg-sunken); color: var(--color-text-strong); }
+  .btn:active { transform: translate(4px, 4px); box-shadow: none; }
+  .btn-ghost { background: transparent; color: var(--color-text); border-color: transparent; padding-inline: 0;
+               text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+  .btn-ghost:hover { color: var(--color-text-strong); }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .stamp { display: inline-block; font: var(--weight-bold) var(--text-xs)/1 var(--font-ui); text-transform: uppercase; letter-spacing: var(--tracking-caps);
+           color: var(--color-accent); border: 2px solid currentColor; padding: var(--space-2) var(--space-3); transform: rotate(-4deg); }
+
+  /* ---------- hero ---------- */
+  .hero { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: center; padding: var(--space-7) 0; }
+  @media (min-width: 820px) { .hero { grid-template-columns: 1.05fr 1fr; gap: var(--space-8); } }
+  .art-slot { aspect-ratio: 1; border: var(--border-heavy); position: relative; box-shadow: 8px 8px 0 var(--ink-800);
+              background:
+                repeating-linear-gradient(-45deg, transparent 0 14px, rgba(57,61,55,.07) 14px 15px),
+                var(--color-bg-sunken);
+              display: grid; place-items: center; }
+  .art-slot span { font: var(--text-sm)/1.3 var(--font-letter); color: var(--color-text-muted); text-align: center; padding: var(--space-4); }
+  .hero .meta { display: flex; flex-direction: column; gap: var(--space-5); }
+
+  /* ---------- release card ---------- */
+  .release { display: grid; grid-template-columns: 1fr; border: var(--border-heavy); background: var(--color-bg-raised); box-shadow: var(--shadow-print); }
+  @media (min-width: 760px) { .release { grid-template-columns: 280px 1fr; } }
+  .release .art-slot { box-shadow: none; border: 0; border-bottom: var(--border-heavy); }
+  @media (min-width: 760px) { .release .art-slot { border-bottom: 0; border-right: var(--border-heavy); } }
+  .release .body-pad { padding: var(--space-5) var(--space-5) var(--space-6); }
+  .tracks { list-style: none; counter-reset: t; margin: var(--space-5) 0; padding: 0; border-top: var(--border-hairline); }
+  .tracks li { counter-increment: t; display: grid; grid-template-columns: 2.5rem 1fr auto; gap: var(--space-3); align-items: baseline;
+               padding: var(--space-3) 0; border-bottom: var(--border-hairline); }
+  .tracks li::before { content: counter(t, decimal-leading-zero); font-family: var(--font-letter); color: var(--color-text-muted); }
+  .tracks .dur { font: var(--text-sm) var(--font-letter); color: var(--color-text-muted); }
+  .tracks .tag { font: var(--weight-bold) 0.65rem/1 var(--font-body); letter-spacing: var(--tracking-caps); text-transform: uppercase;
+                 color: var(--color-accent-text); margin-left: var(--space-2); }
+  .tracks li.redacted span:first-child { background: var(--ink-800); color: transparent; user-select: none; }
+
+  /* ---------- newsletter (inverse) ---------- */
+  .inverse { background: var(--color-bg-inverse); color: var(--color-text-inverse); position: relative; }
+  .inverse a { color: var(--color-accent-on-dark); }
+  .inverse .eyebrow { color: var(--color-accent-on-dark); }
+  .inverse .small { color: var(--color-text-inverse-muted); }
+  .torn { height: 18px; background: var(--color-bg-inverse);
+          -webkit-mask: radial-gradient(9px 9px at 50% 0, transparent 98%, #000) 0 0/18px 18px repeat-x;
+                  mask: radial-gradient(9px 9px at 50% 0, transparent 98%, #000) 0 0/18px 18px repeat-x; }
+  .torn.bottom { transform: scaleY(-1); }
+  .signup { padding: var(--space-8) 0; display: grid; gap: var(--space-5); max-width: 40rem; }
+  .field { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .field label { width: 100%; font: var(--weight-medium) var(--text-sm)/1 var(--font-body); }
+  .field input { flex: 1 1 14rem; min-height: 52px; padding: var(--space-3) var(--space-4); font: var(--text-base) var(--font-letter);
+                 color: var(--ink-900); background: var(--bone-50); border: 3px solid var(--bone-50); border-radius: var(--radius-1); }
+  .field input::placeholder { color: var(--ink-600); }
+  .field .btn-primary { border-color: var(--bone-50); box-shadow: 4px 4px 0 var(--rust-300); }
+
+  /* ---------- footer ---------- */
+  footer { padding: var(--space-7) 0 var(--space-8); border-top: var(--border-heavy); margin-top: var(--space-8); }
+  footer .cols { display: grid; gap: var(--space-6); grid-template-columns: 1fr; }
+  @media (min-width: 760px) { footer .cols { grid-template-columns: 1fr auto auto; align-items: end; } }
+  footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+  footer .logo { height: 110px; color: var(--rust-500); }
+  footer .sign { font-family: var(--font-letter); color: var(--color-text-muted); margin: var(--space-3) 0 0; }
+
+  /* ---------- contrast table ---------- */
+  table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+  th, td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: var(--border-hairline); vertical-align: middle; }
+  th { font-weight: var(--weight-bold); }
+  .pass { color: var(--ink-900); font-weight: var(--weight-bold); }
+  .lg { color: var(--color-accent-text); font-weight: var(--weight-bold); }
+  .demo { display: inline-block; padding: 2px 8px; border: 1px solid var(--ink-600); font-weight: var(--weight-bold); }
+  .scroll { overflow-x: auto; }
+
+  /* reveal motion demo */
+  @keyframes stamp-in { from { opacity: 0; transform: scale(1.08) rotate(-4deg); } to { opacity: 1; transform: scale(1) rotate(-4deg); } }
+  .stamp.animate { animation: stamp-in var(--dur-slow) var(--ease-step) both; }
+</style>
+</head>
+<body>
+
+<!-- SVG filters: rough ink edge for display type -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ink-edge" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+<div class="wrap">
+
+  <!-- NAV -->
+  <nav class="nav" aria-label="Primary">
+    <a href="#" aria-label="Dear You home" style="border:0;padding:0"><svg class="logo logo-1" viewBox="0 0 1524 2952" role="img" aria-label="Dear You"><use href="assets/logo-dearyou.svg#logo"/></svg></a>
+    <ul>
+      <li><a href="#" aria-current="page">Home</a></li>
+      <li><a href="#">Music</a></li>
+      <li><a href="#">Letters</a></li>
+      <li><a href="#">Shop</a></li>
+    </ul>
+    <span class="date">08.29.25</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Hero layout">
+    <div class="art-slot inked" role="img" aria-label="Art placeholder"><span>[ art slot ]<br/>1:1 · 3000×3000</span></div>
+    <div class="meta">
+      <span class="eyebrow">New single · out now</span>
+      <h1 class="display-1 inked">Fault Line</h1>
+      <p class="letter">It's been a while. We're a little older now, still finding our way through life since we last talked.</p>
+      <div class="row">
+        <a class="btn btn-primary" href="#">Buy on Bandcamp</a>
+        <a class="btn btn-ghost" href="#">Read the letter</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PALETTE -->
+  <section class="tile-section">
+    <p class="label">01 — Palette <b>· sampled</b></p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#F0EEE5;color:#393D37">Aa</div><div class="meta"><strong>bone-50</strong>#F0EEE5 · raised</div></div>
+      <div class="sw"><div class="chip" style="background:#E2DFD0;color:#393D37">Aa</div><div class="meta"><strong>bone-100 ★</strong>#E2DFD0 · page</div></div>
+      <div class="sw"><div class="chip" style="background:#D1CDB9;color:#393D37">Aa</div><div class="meta"><strong>bone-200</strong>#D1CDB9 · sunken</div></div>
+      <div class="sw"><div class="chip" style="background:#B9B49E;color:#262924">Aa</div><div class="meta"><strong>bone-300</strong>#B9B49E · rules</div></div>
+      <div class="sw"><div class="chip" style="background:#6A6F66;color:#F0EEE5">Aa</div><div class="meta"><strong>ink-600</strong>#6A6F66 · borders</div></div>
+      <div class="sw"><div class="chip" style="background:#4E534B;color:#F0EEE5">Aa</div><div class="meta"><strong>ink-700</strong>#4E534B · muted text</div></div>
+      <div class="sw"><div class="chip" style="background:#393D37;color:#E2DFD0">Aa</div><div class="meta"><strong>ink-800 ★</strong>#393D37 · text</div></div>
+      <div class="sw"><div class="chip" style="background:#262924;color:#F0EEE5">Aa</div><div class="meta"><strong>ink-900</strong>#262924 · inverse bg</div></div>
+      <div class="sw"><div class="chip" style="background:#E79A84;color:#393D37">Aa</div><div class="meta"><strong>rust-300</strong>#E79A84 · rust on dark</div></div>
+      <div class="sw"><div class="chip" style="background:#C25136;color:#F0EEE5">Aa</div><div class="meta"><strong>rust-500 ★</strong>#C25136 · marks only</div></div>
+      <div class="sw"><div class="chip" style="background:#A3402A;color:#F0EEE5">Aa</div><div class="meta"><strong>rust-600</strong>#A3402A · links/CTA</div></div>
+      <div class="sw"><div class="chip" style="background:#85331F;color:#F0EEE5">Aa</div><div class="meta"><strong>rust-700</strong>#85331F · hover</div></div>
+    </div>
+    <p class="small" style="margin-top:var(--space-5)">Proportion target — bone 80 / ink 17 / rust 3. Rust appears as: one CTA per view, link underlines, misregistration shadow on display type, stamps, the house mark in the logo. Never a section background, never body text at base value.</p>
+    <div class="ratio" aria-hidden="true"><span style="flex:80;background:var(--bone-100)"></span><span style="flex:17;background:var(--ink-800)"></span><span style="flex:3;background:var(--rust-500)"></span></div>
+  </section>
+
+  <!-- CONTRAST -->
+  <section class="tile-section">
+    <p class="label">02 — Contrast <b>· WCAG 2.x</b></p>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Pair</th><th>Ratio</th><th>Verdict</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#262924">ink-900 / bone-100</span></td><td>11.02</td><td class="pass">AAA</td><td>Headlines</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#393D37">ink-800 / bone-100</span></td><td>8.28</td><td class="pass">AAA</td><td>Body text</td></tr>
+        <tr><td><span class="demo" style="background:#F0EEE5;color:#393D37">ink-800 / bone-50</span></td><td>9.53</td><td class="pass">AAA</td><td>Cards</td></tr>
+        <tr><td><span class="demo" style="background:#D1CDB9;color:#393D37">ink-800 / bone-200</span></td><td>6.93</td><td class="pass">AA</td><td>Wells</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#4E534B">ink-700 / bone-100</span></td><td>5.90</td><td class="pass">AA</td><td>Muted text</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#6A6F66">ink-600 / bone-100</span></td><td>3.85</td><td class="lg">AA-large</td><td>Borders, ≥24px only</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#C25136">rust-500 / bone-100</span></td><td>3.47</td><td class="lg">AA-large</td><td>Display / UI marks only</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#A3402A">rust-600 / bone-100</span></td><td>4.72</td><td class="pass">AA</td><td>Links, eyebrows</td></tr>
+        <tr><td><span class="demo" style="background:#E2DFD0;color:#85331F">rust-700 / bone-100</span></td><td>6.30</td><td class="pass">AA</td><td>Link hover</td></tr>
+        <tr><td><span class="demo" style="background:#A3402A;color:#F0EEE5">bone-50 / rust-600</span></td><td>5.43</td><td class="pass">AA</td><td>Primary button</td></tr>
+        <tr><td><span class="demo" style="background:#C25136;color:#F0EEE5">bone-50 / rust-500</span></td><td>3.99</td><td class="lg">AA-large</td><td>Avoid for buttons</td></tr>
+        <tr><td><span class="demo" style="background:#262924;color:#F0EEE5">bone-50 / ink-900</span></td><td>12.68</td><td class="pass">AAA</td><td>Inverse text</td></tr>
+        <tr><td><span class="demo" style="background:#393D37;color:#B9B49E">bone-300 / ink-800</span></td><td>5.32</td><td class="pass">AA</td><td>Inverse muted</td></tr>
+        <tr><td><span class="demo" style="background:#393D37;color:#E79A84">rust-300 / ink-800</span></td><td>4.93</td><td class="pass">AA</td><td>Rust on dark</td></tr>
+        <tr><td><span class="demo" style="background:#393D37;color:#C25136">rust-500 / ink-800</span></td><td>2.39</td><td class="lg" style="color:var(--rust-700)">FAIL</td><td>Never</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section class="tile-section">
+    <p class="label">03 — Type <b>· Logo / Special Elite / Archivo</b></p>
+    <div class="scale-row"><code>brand · logo svg</code><svg class="logo" style="height:180px;color:var(--ink-800)" viewBox="0 0 1524 2952" role="img" aria-label="Dear You"><use href="assets/logo-dearyou.svg#logo"/></svg></div>
+    <div class="scale-row"><code>3xl · Special Elite</code><span class="display-1">Lost Years</span></div>
+    <div class="scale-row"><code>2xl · Special Elite</code><span class="h1">Black Cat</span></div>
+    <div class="scale-row"><code>xl · Special Elite</code><span class="h2">Fault Line</span></div>
+    <div class="scale-row"><code>xl · Archivo 700</code><span class="h3">Black Cat, 2025</span></div>
+    <div class="scale-row"><code>md · Archivo 700</code><span class="h4">Fault Line is out now on Bandcamp.</span></div>
+    <div class="scale-row"><code>base · Archivo</code><p class="body" style="margin:0">Body copy sets in Archivo — sturdy, slightly condensed grotesk that reads clean at 16px on a phone and doesn't fight the handwritten logo.</p></div>
+    <div class="scale-row"><code>md · Special Elite</code><p class="letter" style="margin:0">Dear you — we never really gave you that explanation, and that's something we've carried with us.</p></div>
+    <div class="scale-row"><code>xs · Archivo caps</code><span class="eyebrow">Track 04 · 3:12 · 2026</span></div>
+  </section>
+
+  <!-- BUTTONS / LINKS -->
+  <section class="tile-section">
+    <p class="label">04 — Buttons & links</p>
+    <div class="row" style="margin-bottom:var(--space-6)">
+      <a class="btn btn-primary" href="#">Buy on Bandcamp</a>
+      <a class="btn btn-secondary" href="#">Stream it</a>
+      <a class="btn btn-ghost" href="#">Lyrics</a>
+      <button class="btn btn-primary" disabled>Sold out</button>
+      <span class="stamp animate">Out now</span>
+    </div>
+    <p class="body">Inline links look <a href="#">like this</a> — rust-600 with a heavy underline. Press a button: it slams into its own print shadow (80ms, no bounce).</p>
+  </section>
+
+  <!-- RELEASE CARD -->
+  <section class="tile-section">
+    <p class="label">05 — Release card / tracklist</p>
+    <article class="release">
+      <div class="art-slot inked" role="img" aria-label="Art placeholder"><span>[ art ]</span></div>
+      <div class="body-pad">
+        <span class="eyebrow">2025 – 2026</span>
+        <h2 class="h1" style="margin-top:var(--space-2)">The singles</h2>
+        <ol class="tracks">
+          <li><span>2328</span><span class="dur">—:—</span></li>
+          <li><span>Black Cat</span><span class="dur">—:—</span></li>
+          <li><span>Lost Years</span><span class="dur">—:—</span></li>
+          <li><span>Fault Line<span class="tag">Out now</span></span><span class="dur">—:—</span></li>
+        </ol>
+        <div class="row">
+          <a class="btn btn-primary" href="#">Listen</a>
+          <a class="btn btn-ghost" href="#">All platforms</a>
+        </div>
+      </div>
+    </article>
+    <p class="small" style="margin-top:var(--space-4)">Durations are placeholders.</p>
+  </section>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="torn" aria-hidden="true"></div>
+<section class="inverse" aria-label="Newsletter signup">
+  <div class="wrap">
+    <div class="signup">
+      <span class="eyebrow">Letters from Dear You</span>
+      <h2 class="h1 inked" style="color:var(--bone-50)">Write back.</h2>
+      <p>One email when something real happens. No spam. You hear first, before the internet does.</p>
+      <form class="field" onsubmit="event.preventDefault()">
+        <label for="email">Email address</label>
+        <input id="email" type="email" placeholder="you@somewhere.com" autocomplete="email" />
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+      <p class="small">Unsubscribe any time. <a href="#">Privacy</a></p>
+    </div>
+  </div>
+</section>
+<div class="torn bottom" aria-hidden="true"></div>
+
+<!-- FOOTER -->
+<div class="wrap">
+  <footer>
+    <div class="cols">
+      <div>
+        <svg class="logo logo-2" viewBox="0 0 1524 2952" role="img" aria-label="Dear You"><use href="assets/logo-dearyou.svg#logo"/></svg>
+        <p class="sign">You found the bottom. — Beaumont, TX</p>
+      </div>
+      <ul>
+        <li><a href="#">Bandcamp</a></li>
+        <li><a href="#">Spotify</a></li>
+        <li><a href="#">Shop</a></li>
+      </ul>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+        <li class="small">© Dear You 2026</li>
+      </ul>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>

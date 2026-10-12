@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./tokens.css" />
+<script>
+  /* ---- Hero photo: single source of truth. Swap after the new shoot. ---- */
+  window.HERO_PHOTO = {
+    base: "assets/img/band-placeholder",
+    alt: "dear you standing in a sandy clearing in front of a pine treeline",
+    focus: "55% 50%"
+  };
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--surface-page); color: var(--color-text); overflow-x: hidden;
+         font: var(--weight-regular) var(--text-base)/var(--leading-body) var(--font-body); }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--color-accent-text); }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+  .inverse :focus-visible { outline-color: var(--color-focus-inverse); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .logo { display: block; height: auto; fill: currentColor; }
+  .page { max-width: 80rem; margin: 0 auto; padding: 0 var(--gutter); position: relative; }
+  .date { font-family: var(--font-letter); }
+  .label { font: var(--weight-bold) var(--text-xs)/1 var(--font-ui); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-text-muted); }
+  /* hand lettering: traced SVGs in assets/hand/ (one drawing per word), sized by the wrapper font-size */
+  .hand { font-weight: 400; line-height: 1; letter-spacing: .01em;
+          text-decoration: none; display: inline-block; }
+  .hand { display: inline-block; } .hand .hw { display: block; height: 1.5em; width: auto; fill: currentColor; overflow: visible; }
+  .hand .hw-you-found-the-bottom { height: 2.6em; } .hand .hw-elsewhere { height: 1.3em; }
+
+  /* ================= HERO: photo + logo, off-axis ================= */
+  .head { position: relative; padding-top: var(--space-5); }
+  .scatter { display: flex; justify-content: space-between; align-items: start; padding: 0 2% var(--space-6); }
+  .scatter a { font-size: 1.6rem; color: var(--ink-900); }
+  .scatter a:hover { color: var(--rust-600); }
+  .scatter .w1 { transform: none; } .scatter .w2 { transform: translateY(14px); } .scatter .w3 { transform: translateY(4px); }
+  .head .logo-big { color: var(--ink-900); width: auto; height: 230px; margin: 0 0 var(--space-6) -6px; transform: rotate(-3deg); }
+  .photo { position: relative; transform: rotate(-1.2deg); aspect-ratio: 4 / 5; overflow: hidden; background: var(--ink-900); }
+  .photo picture, .photo img { width: 100%; height: 100%; }
+  .photo img { object-fit: cover; filter: saturate(.55) sepia(.22) contrast(1.06) brightness(.96); }
+  .photo::before, .photo::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+  .photo::before { background: var(--bone-100); mix-blend-mode: soft-light; opacity: .55; }
+  .photo::after { background: var(--rust-500); mix-blend-mode: color; opacity: .08; }
+  @media (min-width: 900px) {
+    .head { height: 760px; padding: 0; }
+    .scatter { display: block; padding: 0; }
+    .scatter a { position: absolute; font-size: 2rem; z-index: 3; }
+    .scatter .w1 { top: 48px; left: 2%; }
+    .scatter .w2 { top: 30px; left: 48%; }
+    .scatter .w3 { top: 690px; right: 5%; }
+    .head .logo-big { position: absolute; top: 170px; left: 0; height: 460px; margin: 0; z-index: 2; }
+    .photo { position: absolute; top: 110px; right: 0; width: 66%; aspect-ratio: 3 / 2; }
+  }
+
+  /* ================= ABOUT: one blurb, lots of air ================= */
+  .about { padding-block: clamp(8rem, 22vw, 16rem) var(--space-section); display: grid; gap: var(--space-4); }
+  .about .hand { font-size: 1.8rem; color: var(--ink-900); transform: none; justify-self: start; }
+  .about p { margin: 0; font: var(--weight-medium) clamp(1.35rem, 3.4vw, 2rem)/1.35 var(--font-ui); letter-spacing: -0.01em;
+             color: var(--ink-900); max-width: 30rem; }
+  .about .ph { font-size: var(--text-sm); color: var(--color-text-muted); }
+  @media (min-width: 900px) { .about { margin-left: 42%; } }
+
+  /* ================= LISTEN: what we're pushing ================= */
+  .listen h2 { margin: 0 0 var(--space-7); font-size: clamp(3rem, 9vw, 5.5rem); color: var(--ink-900); margin-left: 6%; transform: none; }
+  .rel { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-8); }
+  .rel .art { aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; }
+  .rel .art img { width: 100%; height: 100%; object-fit: cover; }
+  .rel h3 { font: var(--weight-bold) var(--text-xl)/1.1 var(--font-ui); letter-spacing: var(--tracking-tight); margin: var(--space-4) 0 var(--space-1); color: var(--ink-900); }
+  .rel .m { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .rel .links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin-top: var(--space-4); font-weight: var(--weight-bold); }
+  .rel .links a { text-decoration: none; border-bottom: var(--rule); }
+  .rel .links a:hover { border-color: currentColor; }
+  .rel .lead { position: relative; }
+  .rel .lead .art { transform: rotate(-1.5deg); }
+  .rel .out { position: absolute; z-index: 3; top: -34px; right: -2%; font-size: 1.8rem; color: var(--ink-900); transform: none; }
+  .rel .held { width: 62%; margin-left: auto; }
+  .rel .held .art { background: var(--surface-solid); place-items: start center; transform: rotate(2deg); }
+  .rel .held .t2 { width: 14%; }
+  .rel .held .t2 img { width: 100%; height: auto; transform-origin: top center; animation: fall 2.4s var(--ease-in-out) both; }
+  .rel .held h3 { font-size: var(--text-md); }
+  @keyframes fall { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
+  .bar { display: inline-block; height: .75em; background: var(--ink-900); }
+  @media (min-width: 900px) {
+    .rel { grid-template-columns: repeat(12, 1fr); gap: var(--space-6); align-items: start; }
+    .rel .lead { grid-column: 1 / span 6; }
+    .rel .held { grid-column: 8 / span 3; width: auto; margin: 46% 0 0; }
+  }
+  /* the line tease-04 sits on, watching */
+  .ledge { position: relative; border-top: var(--rule); margin-top: var(--space-9); }
+  /* sits ON the rule: line crosses at his seat (~68% down), feet dangle below */
+  .ledge .t4 { position: absolute; bottom: 100%; left: 14%; height: 58px; margin-bottom: -1px; transform: translateY(32%); }
+  .ledge .t4 img { height: 100%; width: auto; }
+  @media (min-width: 900px) { .ledge { margin-right: 30%; } .ledge .t4 { height: 72px; left: 8%; } }
+
+  /* ================= ELSEWHERE: streaming + socials, big + stepped ================= */
+  .elsewhere { padding-top: var(--space-section); display: grid; gap: var(--space-7); }
+  .elsewhere h2 { margin: 0; font-size: clamp(2.6rem, 8vw, 4.5rem); color: var(--ink-900); transform: none; justify-self: end; margin-right: 4%; }
+  .cols { display: grid; gap: var(--space-7); }
+  .big { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; gap: var(--space-1); }
+  .big a { font: var(--weight-bold) clamp(1.8rem, 5.6vw, 3.2rem)/1.12 var(--font-ui); letter-spacing: var(--tracking-tight);
+           text-decoration: none; color: var(--ink-900); display: inline-block; transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast); }
+  .big a::after { content: " ↗"; font-weight: 400; color: var(--ink-600); }
+  .big a:hover { color: var(--rust-600); transform: translateX(8px) rotate(-1deg); }
+  .big li:nth-child(2) { padding-left: 10%; } .big li:nth-child(3) { padding-left: 3%; } .big li:nth-child(4) { padding-left: 16%; } .big li:nth-child(5) { padding-left: 7%; }
+  .note { font-size: var(--text-sm); color: var(--color-text-muted); margin: var(--space-4) 0 0 16%; }
+  @media (min-width: 900px) { .cols { grid-template-columns: 1fr 1fr; gap: var(--space-6); } .cols > div:last-child { margin-top: var(--space-9); } }
+
+  /* ================= MERCH: small, tilted, off to the side ================= */
+  .merch { display: inline-grid; gap: var(--space-2); margin: var(--space-section) 0 0 8%; padding: var(--space-5) var(--space-6);
+           background: var(--surface-solid); color: var(--bone-50); text-decoration: none; transform: rotate(-4deg);
+           transition: transform var(--dur-base) var(--ease-out), background-color var(--dur-fast); }
+  .merch:hover { transform: rotate(2deg) scale(1.04); color: var(--bone-50); background: var(--rust-600); }
+  .merch .hand { font-size: 2rem; color: var(--bone-50); }
+  .merch span:last-child { font-size: var(--text-sm); color: var(--bone-100); }
+
+  /* ================= OMEN (tease-01) + easter egg ================= */
+  .omen { position: relative; padding-top: clamp(9rem, 24vw, 18rem); }
+  .omen .rule { position: relative; border-top: var(--rule); }
+  .omen .t1 { position: absolute; bottom: 100%; left: 58%; width: 150px; height: 60px; overflow: hidden; cursor: default; margin-bottom: -1px;
+              -webkit-tap-highlight-color: transparent; }
+  .omen .t1 img { width: 100%; height: auto; transform: translateY(100%); transition: transform 3.2s var(--ease-in-out); }
+  .omen.peek .t1 img { transform: translateY(0); }
+  .omen.gone .t1 img { transform: translateY(100%); transition-duration: 400ms; }
+  .omen .egg { position: absolute; left: 58%; top: calc(100% + var(--space-3)); font-size: var(--text-lg); color: var(--ink-900);
+               opacity: 0; transition: opacity 1.2s var(--ease-out); pointer-events: none; }
+  .omen.gone .egg { opacity: 1; }
+  .omen .bars { display: grid; gap: var(--space-3); width: min(80%, 22rem); margin: var(--space-7) 0 0 auto; }
+  .omen .bars span { display: block; height: 12px; background: var(--ink-900); }
+  @media (min-width: 900px) { .omen .t1 { width: 240px; height: 96px; left: 62%; } .omen .egg { left: 64%; } }
+
+  /* ================= FOOTER ================= */
+  footer { margin-top: var(--space-section); padding: var(--space-8) 0 var(--space-7); border-top: var(--rule); }
+  footer .logo-h { width: min(78vw, 380px); height: auto; color: var(--ink-900); transform: rotate(-2deg); }
+  footer .bottom { font-size: 1.5rem; color: var(--ink-700); transform: none; margin: var(--space-5) 0 0 4%; }
+  footer .legal { margin-top: var(--space-8); font-size: var(--text-sm); color: var(--color-text-muted); }
+  @media (min-width: 900px) { footer .wrapf { display: flex; align-items: end; justify-content: space-between; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rel .held .t2 img { animation: none; }
+    .omen .t1 img { transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= HERO ================= -->
+  <header class="head" id="top">
+    <nav class="scatter" aria-label="Primary">
+      <a class="hand w1" data-hand="H01" href="#about" aria-label="about"><svg class="hw hw-about" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></a>
+      <a class="hand w2" data-hand="H02" href="#listen" aria-label="listen"><svg class="hw hw-listen" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
+      <a class="hand w3" data-hand="H04" href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw hw-merch" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+    </nav>
+    <h1 class="sr-only">dear you</h1>
+    <svg class="logo logo-big" viewBox="0 0 1524 2952" aria-hidden="true"><use href="assets/logo-dearyou.svg#logo"/></svg>
+    <div class="photo" id="hero-photo"><!-- <picture> from HERO_PHOTO --></div>
+  </header>
+
+  <!-- ================= ABOUT (blurb) ================= -->
+  <section class="about" id="about" aria-labelledby="about-title">
+    <span class="hand" id="about-title" data-hand="H01"><span class="sr-only">about</span><svg class="hw hw-about" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></span>
+    <p>four friends from beaumont, texas. we stopped for ten years and couldn't stay quiet. we're making the record we always meant to.</p>
+    <span class="ph">[placeholder blurb, chris to write]</span>
+  </section>
+
+  <!-- ================= LISTEN ================= -->
+  <section class="listen" id="listen" aria-labelledby="listen-title">
+    <h2 class="hand" id="listen-title" data-hand="H03"><span class="sr-only">listen</span><svg class="hw hw-listen" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></h2>
+    <ul class="rel">
+      <li class="lead">
+        <span class="hand out" data-hand="H05" aria-hidden="true"><svg class="hw hw-out-now" viewBox="0 0 2000 1512" aria-hidden="true" focusable="false"><use href="assets/hand/out-now.svg#h"/></svg></span>
+        <div class="art">
+          <picture>
+            <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="(min-width: 900px) 45vw, 100vw">
+            <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="(min-width: 900px) 45vw, 100vw">
+            <img src="assets/img/fault-line-cover-600.jpg" alt="fault line cover: a split image of a person on a rust chair" loading="lazy" decoding="async">
+          </picture>
+        </div>
+        <h3>fault line</h3><div class="m">single · 2026 · out now</div>
+        <div class="links"><a href="#">spotify</a><a href="#">apple music</a><a href="#">bandcamp</a><a href="#">youtube</a></div>
+      </li>
+      <!-- next single: held until confirmed. motif only (tease-02). -->
+      <li class="held" aria-label="next single, not yet">
+        <div class="art"><picture class="t2" aria-hidden="true"><source type="image/webp" srcset="assets/img/tease-02.webp"><img src="assets/img/tease-02.png" alt="" width="200" height="680" loading="lazy" decoding="async"></picture></div>
+        <h3><span class="bar" style="width:70%"></span></h3><div class="m">next. not yet.</div>
+      </li>
+    </ul>
+    <!-- tease-04 sits on this line and watches -->
+    <div class="ledge" aria-hidden="true">
+      <picture class="t4"><source type="image/webp" srcset="assets/img/tease-04.webp"><img src="assets/img/tease-04.png" alt="" width="161" height="300" loading="lazy" decoding="async"></picture>
+    </div>
+  </section>
+
+  <!-- ================= ELSEWHERE ================= -->
+  <section class="elsewhere" id="elsewhere" aria-labelledby="elsewhere-title">
+    <h2 class="hand" id="elsewhere-title" data-hand="H06"><span class="sr-only">elsewhere</span><svg class="hw hw-elsewhere" viewBox="0 0 2208 1452" aria-hidden="true" focusable="false"><use href="assets/hand/elsewhere.svg#h"/></svg></h2>
+    <div class="cols">
+      <div>
+        <span class="label">hear it</span>
+        <ul class="big">
+          <li><a href="#">spotify</a></li>
+          <li><a href="#">apple music</a></li>
+          <li><a href="#">bandcamp</a></li>
+        </ul>
+        <p class="note">bandcamp is the one that helps us most.</p>
+      </div>
+      <div>
+        <span class="label">find us</span>
+        <ul class="big">
+          <li><a href="#">instagram</a></li>
+          <li><a href="#">tiktok</a></li>
+          <li><a href="#">youtube</a></li>
+          <li><a href="#">facebook</a></li>
+          <li><a href="#">x / twitter</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MERCH ================= -->
+  <a class="merch inverse" href="https://shop.dearyoutx.com" aria-label="merch: shop.dearyoutx.com">
+    <span class="hand" data-hand="H04"><span class="sr-only">merch</span><svg class="hw hw-merch" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></span>
+    <span>shirts and things you can hold →</span>
+  </a>
+
+  <!-- ================= OMEN (tease-01) — no words. 3 clicks = egg ================= -->
+  <section class="omen" id="omen" aria-label="something is coming">
+    <div class="rule">
+      <div class="t1" id="t1" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/tease-01.webp"><img src="assets/img/tease-01.png" alt="" width="450" height="180" loading="lazy" decoding="async"></picture></div>
+      <span class="egg date" aria-live="polite">08.17.25</span>
+    </div>
+    <div class="bars" aria-hidden="true"><span style="width:40%"></span><span style="width:100%"></span><span style="width:62%"></span></div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrapf">
+      <div>
+        <svg class="logo logo-h" viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+        <p class="hand bottom" data-hand="H07"><span class="sr-only">you found the bottom.</span><svg class="hw hw-you-found-the-bottom" viewBox="0 0 5204 1680" aria-hidden="true" focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg></p>
+      </div>
+      <p class="legal">© dear you 2026 · beaumont, tx</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var shot = new URLSearchParams(location.search).has("shot");
+    var p = window.HERO_PHOTO, b = p.base, ss = function (e) { return b + "-1200." + e + " 1200w, " + b + "-2400." + e + " 2400w"; };
+    document.getElementById("hero-photo").innerHTML = '<picture><source type="image/avif" srcset="' + ss("avif") + '" sizes="(min-width:900px) 66vw, 100vw">' +
+      '<source type="image/webp" srcset="' + ss("webp") + '" sizes="(min-width:900px) 66vw, 100vw">' +
+      '<img src="' + b + '-1200.jpg" alt="' + p.alt + '" style="object-position:' + p.focus + '" fetchpriority="high" decoding="async"></picture>';
+
+    // tease-01 peeks when its rule scrolls into view
+    var omen = document.getElementById("omen");
+    if ("IntersectionObserver" in window && !shot) {
+      new IntersectionObserver(function (es, o) { es.forEach(function (e) { if (e.isIntersecting) { omen.classList.add("peek"); o.disconnect(); } }); },
+        { rootMargin: "0px 0px -25% 0px" }).observe(omen);
+    } else omen.classList.add("peek");
+
+    // easter egg: poke tease-01 three times
+    var n = 0;
+    document.getElementById("t1").addEventListener("click", function () { if (++n === 3) omen.classList.add("gone"); });
+  })();
+</script>
+</body>
+</html>

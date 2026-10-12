@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# design: raw source photos stay out of git/build
+design/assets/*.png
+design/assets/art/
+design/shots/
+
+# unreleased audio: never in the public repo before release day
+design/assets/audio/silk-and-gold*

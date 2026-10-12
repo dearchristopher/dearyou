@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Dear You — design tokens v2 (flat) + v3 night theme (see bottom)  (branch: design/system-v1)
+   Palette sampled from the band's screenprint art:
+     bone #E2DFD0 · ink #393D37 · rust #C25136
+   Flat system, cued by the band's art: solid fills, no shadows, no texture.
+   - Mostly bone. Ink for type, thin rules and solid blocks.
+   - ONE rust shape per view — the focal point. Never scattered rust specks.
+   - Hand lettering (the logo) is the only expressive texture.
+   ========================================================================== */
+
+:root {
+  /* ---- Color: primitives ------------------------------------------------ */
+  --bone-50:  #F0EEE5;  /* inputs on ink */
+  --bone-100: #E2DFD0;  /* BASE — page */
+  --bone-200: #D1CDB9;  /* flat placeholder blocks, hover fill */
+  --bone-300: #B9B49E;  /* muted text on ink */
+
+  --ink-600: #6A6F66;   /* large text / non-text only (3.85:1 on bone) */
+  --ink-700: #4E534B;   /* secondary text */
+  --ink-800: #393D37;   /* BASE ink — text, rules */
+  --ink-900: #262924;   /* solid ink blocks */
+
+  --night-900: #232421; /* v3 BASE: page (the dark room). sampled from the merch card Chris liked */
+  --night-800: #2E302B; /* quiet fills on night (empty slots) */
+  --night-600: #6A6C62; /* hairlines / non-text on night only (3.0:1) */
+  --night-muted: #9A9888; /* secondary text on night (5.37:1) */
+
+  --rust-300: #E79A84;  /* rust text on ink */
+  --rust-500: #C25136;  /* BASE rust — the one focal shape per view */
+  --rust-600: #A3402A;  /* rust button fill / rust text on bone (AA) */
+  --rust-700: #85331F;  /* hover / pressed */
+
+  /* ---- Color: semantic -------------------------------------------------- */
+  --color-bg:            var(--bone-100);
+  --color-bg-raised:     var(--bone-100);  /* flat: nothing is raised */
+  --color-bg-sunken:     var(--bone-200);
+  --color-bg-inverse:    var(--ink-900);
+
+  --color-text:          var(--ink-800);   /* 8.28:1 on bone-100 */
+  --color-text-strong:   var(--ink-900);   /* 11.02:1 */
+  --color-text-muted:    var(--ink-700);   /* 5.90:1 */
+  --color-text-inverse:  var(--bone-50);   /* 12.68:1 on ink-900 */
+  --color-text-inverse-muted: var(--bone-300); /* 5.32:1 on ink-800 */
+
+  --color-accent:        var(--rust-500);  /* shapes / ≥24px type: 3.47:1 */
+  --color-accent-text:   var(--rust-600);  /* body-size rust text: 4.72:1 */
+  --color-accent-hover:  var(--rust-700);  /* 6.30:1 */
+  --color-accent-on-dark: var(--rust-300); /* 4.93:1 on ink-800 */
+
+  --color-border:        var(--ink-800);
+  --color-border-subtle: var(--ink-600);
+  --color-focus:         var(--ink-900);   /* focus ring on bone */
+  --color-focus-inverse: var(--bone-50);   /* focus ring on ink / photo */
+
+  /* ---- Elevation: flat --------------------------------------------------- */
+  /* No shadows, no blur, no offset prints, no gradients (photo scrim excepted).
+     Hierarchy comes from: fill (bone → bone-200 → ink-900), space, and 1px ink rules. */
+  --elevation-0: none;
+  --surface-page:    var(--bone-100);
+  --surface-quiet:   var(--bone-200);  /* placeholders, hover */
+  --surface-solid:   var(--ink-900);   /* blocks, inverse sections */
+  --surface-focal:   var(--rust-500);  /* one per view */
+
+  /* ---- Lines: thin, ink, like the engraving ------------------------------ */
+  --rule:        1px solid var(--ink-800);
+  --rule-subtle: 1px solid var(--ink-600);
+  --rule-inverse: 1px solid var(--bone-300);
+  --border-hairline: var(--rule);    /* deprecated alias (v1) */
+  --border-heavy:    var(--rule);    /* deprecated alias (v1) — no heavy borders in v2 */
+
+  /* ---- Type ------------------------------------------------------------- */
+  /* Brand display = the handwritten logo (assets/logo-dearyou.svg), not a font. */
+  --font-body:    "Archivo", "Helvetica Neue", Arial, sans-serif; /* UI + body + headings */
+  --font-ui:      var(--font-body);
+  --font-letter:  "Special Elite", "Courier New", monospace;      /* letter dates only */
+  --font-display: var(--font-body);  /* alias (v1) */
+
+  /* Modular scale 1.25 (major third), 16px base, fluid at the top end */
+  --text-xs:   0.8rem;    /* 12.8 */
+  --text-sm:   0.875rem;  /* 14   */
+  --text-base: 1rem;      /* 16   */
+  --text-md:   1.25rem;   /* 20   */
+  --text-lg:   1.563rem;  /* 25   */
+  --text-xl:   1.953rem;  /* 31   */
+  --text-2xl:  clamp(2rem,   5vw, 2.441rem);  /* 39 */
+  --text-3xl:  clamp(2.5rem, 7vw, 3.815rem);  /* 61 */
+
+  --leading-tight: 1.05;
+  --leading-snug:  1.25;
+  --leading-body:  1.6;
+  --tracking-tight: -0.02em;  /* large Archivo headings */
+  --tracking-caps:   0.12em;  /* small caps labels */
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-bold:    700;
+
+  /* ---- Spacing (4px base) — be generous; let it breathe ------------------- */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --space-section: clamp(5rem, 12vw, 10rem);
+
+  --measure: 60ch;
+  --container: 76rem;
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+
+  /* ---- Radii: square ---------------------------------------------------- */
+  --radius-0: 0;
+  --radius-1: 2px;   /* buttons, inputs */
+
+  /* ---- Motion: short, no bounce ---------------------------------------- */
+  --dur-instant: 80ms;
+  --dur-fast:    140ms;
+  --dur-base:    220ms;
+  --dur-slow:    420ms;
+  --ease-out:    cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+/* ---- v3 · NIGHT (2026-10-07): the site is dark. Bone is the inverted surface. ----
+   Opt in with <html data-theme="night">. Older mocks keep the bone system above.
+   Contrast on #232421: bone-100 11.67 · bone-300 7.49 · night-muted 5.37 · rust-300 6.95 (text)
+   rust-500 3.36 (shapes / >=24px type only) · rust-600 2.47 (FAILS, never on night). */
+[data-theme="night"] {
+  --color-bg:            var(--night-900);
+  --color-bg-sunken:     var(--night-800);
+  --color-bg-inverse:    var(--bone-100);   /* the occasional light panel */
+  --color-text:          var(--bone-100);
+  --color-text-strong:   var(--bone-50);
+  --color-text-muted:    var(--night-muted);
+  --color-text-inverse:  var(--ink-900);
+  --color-accent:        var(--rust-500);   /* shapes, the one focal per view */
+  --color-accent-text:   var(--rust-300);   /* rust text on night */
+  --color-accent-hover:  #F0B4A3;
+  --color-border:        var(--bone-200);
+  --color-border-subtle: var(--night-600);
+  --color-focus:         var(--bone-50);
+  --color-focus-inverse: var(--ink-900);
+  --surface-page:  var(--night-900);
+  --surface-quiet: var(--night-800);
+  --surface-solid: var(--bone-100);
+  --rule:          1px solid var(--bone-200);
+  --rule-subtle:   1px solid var(--night-600);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}

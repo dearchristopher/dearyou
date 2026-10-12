@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>dear you</title>
+<meta name="description" content="dear you. pop punk from beaumont, texas." />
+<meta name="theme-color" content="#232421" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&text=0123456789.&display=swap" rel="stylesheet" /><!-- egg date only -->
+<link rel="stylesheet" href="./tokens.css" />
+<script>
+  /* first visit or return visit? decided before paint so the hero never jumps.
+     dyx-seen = timestamp of the last visit, refreshed every visit. you're "returning" only
+     if that was within RETURN_WINDOW_DAYS; after that, you get the whole weird intro again.
+     ?first=1 forces the first-visit intro, ?first=0 forces the return view. */
+  var RETURN_WINDOW_DAYS = 14;
+  (function () {
+    var q = new URLSearchParams(location.search).get("first"), seen = false;
+    try {
+      var last = parseInt(localStorage.getItem("dyx-seen"), 10);      // legacy "1" parses to 1 → long ago → first visit
+      seen = last > 0 && Date.now() - last < RETURN_WINDOW_DAYS * 864e5;
+      localStorage.setItem("dyx-seen", String(Date.now()));
+    } catch (e) {}
+    var ret = q === "1" ? false : q === "0" ? true : seen;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) ret = true;   /* no intro for reduced motion */
+    document.documentElement.classList.add(ret ? "ret" : "first");
+  })();
+</script>
+<style>
+  /* =====================================================================
+     v6 · "someone's in the room", dark.  v5's concept + home-mock-dark's palette and directness.
+     Every room has a floor. The guy sits on one of them, and is never where you left him.
+     Motion budget: ONE short pinned scene (the hero, first visit only). Everything else is a
+     ~500ms reveal on enter. transform + opacity only.
+     ===================================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; scroll-behavior: smooth; color-scheme: dark; }
+  body { margin: 0; background: var(--night-900); color: var(--bone-100); overflow-x: clip;
+         font: 400 1rem/1.5 var(--font-body); -webkit-font-smoothing: antialiased; }
+  b, strong, h1, h2, h3 { font-weight: inherit; }
+  /* TWO voices: Chris's hand lettering for every display moment; Archivo for everything else.
+     Archivo 300 only at >=18px (thin text on dark blurs below that); 400 under 16px, and for links + buttons. */
+  .t-light { font-weight: 300; }
+  img, svg { display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--bone-50); outline-offset: 4px; }
+  .lit :focus-visible { outline-color: var(--ink-900); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skiplink { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--bone-100); color: var(--ink-900); padding: .75rem 1rem; }
+  .skiplink:focus { top: 1rem; }
+
+  :root {
+    --gx: 1.25rem;
+    --guy-h: 60px;
+    --ease: cubic-bezier(.22, .8, .2, 1);
+    --muted: var(--night-muted);
+  }
+  @media (min-width: 900px) { :root { --gx: 2.5rem; --guy-h: 88px; } }
+
+  .logo-svg, .hw { fill: currentColor; }
+  .hw { display: block; height: 1em; width: auto; overflow: visible; }
+  .draft { font-size: .6875rem; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--muted); }
+
+  /* =====================================================================
+     GLITCH: the room is possessed. Nothing tweens; it snaps through 3-6 states (steps()).
+     Flat vocabulary only: slice displacement, a one-frame rust duplicate, wrong-place-then-snap,
+     stuttering lettering, the guy skipping along the line. transform / translate / clip-path / opacity.
+     Safety: <= 3 glitches per second (JS budget), no full-screen flashes, readable in ~300ms,
+     prefers-reduced-motion = none. Return visitors: hero + horns only.
+     ===================================================================== */
+  :root { --room-bg: var(--night-900); }
+
+  /* reveal on enter = appears in the wrong place, snaps to the right one (3 frames, ~260ms) */
+  .rv, .st { opacity: 0; }
+  .on .rv { animation: g-in .26s steps(1, end) both; animation-delay: calc(var(--i, 0) * 40ms); }
+  .on .st { animation: g-stutter .3s steps(1, end) both; animation-delay: calc(var(--i, 0) * 40ms); }
+  .ret .on .rv, .ret .on .st { animation: g-plain .2s steps(2, end) both; }   /* toned down for return visitors */
+  @keyframes g-in { 0% { opacity: 1; translate: var(--wx1, 14px) var(--wy1, 6px); } 35% { translate: var(--wx2, -8px) var(--wy2, -3px); } 70%, 100% { opacity: 1; translate: 0 0; } }
+  @keyframes g-stutter { 0% { opacity: 0; } 15% { opacity: 1; translate: -10px 5px; } 45% { translate: 7px -4px; } 75% { translate: -3px 1px; } 100% { opacity: 1; translate: 0 0; } }
+  @keyframes g-plain { from { opacity: 0; } to { opacity: 1; } }
+  .g-wrong { animation: g-in .26s steps(1, end) both !important; }
+  .g-stut { animation: g-stutter .3s steps(1, end) both !important; }
+
+  /* clones: flat copies laid exactly over the original for 1-3 frames */
+  .gl { position: absolute !important; margin: 0 !important; pointer-events: none; z-index: 8; transform: none !important; opacity: 1 !important; animation-fill-mode: both; }
+  .gl * { animation: none !important; opacity: 1 !important; translate: none !important; }   /* a copy of the settled state, never a replay */
+  .gl.slice { background: var(--room-bg); clip-path: inset(var(--a) 0 var(--b) 0); animation: g-slice .2s steps(1, end) both; }
+  @keyframes g-slice { 0% { translate: var(--d1) 0; } 40% { translate: var(--d2) 0; } 80% { translate: 0 0; opacity: 1; } 100% { translate: 0 0; opacity: 0; } }
+  .gl.rust { color: var(--rust-500) !important; translate: var(--rx) var(--ry); animation: g-blink .1s steps(1, end) both; }
+  .gl.rust * { color: inherit !important; }
+  .gl.rust.box { background: var(--rust-500); }
+  @keyframes g-blink { 0%, 99% { opacity: 1; } 100% { opacity: 0; } }
+  .lit.wipe { animation: g-wipe .32s steps(1, end) both; }   /* lights on: a stepped wipe, ONE luminance change, never a strobe */
+  @keyframes g-wipe { 0% { clip-path: inset(0 0 80% 0); } 25% { clip-path: inset(0 0 55% 0); translate: -10px 0; } 50% { clip-path: inset(0 0 28% 0); translate: 6px 0; } 75% { clip-path: inset(0 0 9% 0); translate: 0 0; } 100% { clip-path: inset(0 0 0 0); } }
+
+  .glabel { position: fixed; left: .75rem; bottom: .75rem; z-index: 60; padding: .4rem .6rem; background: var(--bone-100); color: var(--ink-900); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); text-transform: uppercase; }
+
+  /* ---------- floors + the guy (one per room; only the one you're looking at is there) ---------- */
+  .floor { position: relative; height: 1px; }
+  .floor::before { content: ""; position: absolute; inset: 0; background: currentColor; transform-origin: 0 50%; transform: scaleX(var(--draw, 0)); transition: transform .4s steps(5, end); }
+  .on > .floor, .floor.on { --draw: 1; }
+  .guy { position: absolute; bottom: 0; left: var(--x, 50%); height: var(--guy-h); aspect-ratio: 161 / 300; background: currentColor;
+         -webkit-mask: url(assets/img/tease-04-bone.png) center / contain no-repeat; mask: url(assets/img/tease-04-bone.png) center / contain no-repeat;
+         transform: translateY(32%);   /* loved: sits ON the rule, feet dangling below it */
+         translate: var(--skip, 0px) 0;   /* he never walks. he skips. */
+         opacity: 0; transition: opacity .16s steps(2, end); pointer-events: none; }
+  .guy.here { opacity: 1; }
+
+  /* ---------- quick nav: always there for people who've been here before ---------- */
+  .qnav { position: fixed; top: 0; right: 0; z-index: 30; display: flex; align-items: center; padding: .25rem calc(var(--gx) - .5rem) .25rem .5rem;
+          background: var(--night-900); color: var(--bone-100); transform: translateY(-110%); transition: transform .24s steps(3, end); }
+  .qnav.on, .ret .qnav { transform: none; }
+  .qnav a { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: .25rem .5rem; font-size: 1.7rem; }
+  .qnav a:hover { color: var(--rust-300); }
+  @media (min-width: 900px) { .qnav { padding-top: .5rem; padding-bottom: .5rem; } .qnav a { font-size: 2.1rem; padding: .25rem .7rem; } }
+
+  /* =================== 1 · HERO (the only pin) =================== */
+  .hero { position: relative; height: 150svh; }
+  .ret .hero { height: 100svh; }
+  .hero .view { position: sticky; top: 0; height: 100svh; overflow: hidden; --floor: 78svh; }
+  .hero .photo { position: absolute; left: 0; top: 0; width: 100%; height: 70svh; background: var(--night-900); transform-origin: 0 0; will-change: transform; }
+  .hero .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 56% 50%; }   /* 56%: keeps both members in frame from 360 to 1600 */
+  .hero .logo { position: absolute; z-index: 2; left: var(--gx); top: calc(70svh - 19svh * .35); height: 19svh; width: auto; color: var(--bone-100); will-change: transform; }   /* spills over the photo's bottom edge */
+  .hero .logo .stack { display: none; }
+  .hero .wall { position: absolute; right: var(--gx); top: calc(70svh + .75rem); display: grid; justify-items: end; gap: .1rem; will-change: opacity; }
+  .hero .wall nav { display: flex; }
+  .hero .wall nav a { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: .25rem .4rem; font-size: 1.9rem; }
+  .hero .wall nav a:hover { color: var(--rust-300); }
+  .ret .hero .wall { display: none; }
+  .hero .floor { position: absolute; left: 0; right: 0; top: var(--floor); color: var(--bone-200); }
+  .hero .floor::before { transition: none; }
+  .hero .sent { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; }
+  .hero .said { opacity: 0; }
+  .hero[data-stage="4"] .said { opacity: 1; animation: g-stutter .3s steps(1, end) both; }
+  .hero:not([data-stage="0"]) .wall { visibility: hidden; }
+  .hero .guy { --x: 12vw; }
+  .hero .said { position: absolute; left: var(--gx); right: var(--gx); top: calc(var(--floor) + 1.1rem); margin: 0;
+                font-weight: 300; font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.3; color: var(--bone-100); }
+  @media (min-width: 900px) {
+    .hero .photo { left: 25vw; width: 75vw; height: 100svh; }
+    .hero .logo { --lh: min(37vw, 60svh); top: auto; bottom: 6svh; height: var(--lh); left: max(var(--gx), calc(25vw - var(--lh) * .5163 * .8)); }   /* spills over the photo's left edge, every width */
+    .hero .logo .stack { display: block; } .hero .logo .horiz { display: none; }
+    .hero .wall { right: auto; left: calc(var(--gx) - .4rem); top: 1.25rem; justify-items: start; }
+    .hero .wall nav a { font-size: 2.6rem; }
+    .hero .guy { --x: 34vw; }
+  }
+
+  /* =================== 2 · LISTEN (releases first, under two scrolls in) =================== */
+  .listen { position: relative; padding: 9svh var(--gx) 0; }
+  .listen h2.hand { margin: 0 0 2rem; font-size: clamp(3rem, 9vw, 5.5rem); color: var(--bone-100); }
+  .rel { list-style: none; margin: 0; padding: 0; display: grid; gap: 4rem; }
+  .rel .art { position: relative; aspect-ratio: 1; overflow: hidden; }
+  .rel .art img { width: 100%; height: 100%; object-fit: cover; }
+  .rel .lead { position: relative; }
+  .rel .out { position: absolute; z-index: 2; top: -2.6rem; right: -.5rem; font-size: clamp(3rem, 7vw, 4.6rem); color: var(--rust-300); }
+  .rel h3 { margin: 1.1rem 0 .2rem; font-weight: 300; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; }
+  .rel .m { font-size: var(--text-sm); color: var(--muted); }
+  .links { list-style: none; margin: .9rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.4rem; }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 400; font-size: var(--text-md); text-decoration: none; }
+  .links a span { border-bottom: 1px solid rgba(226, 223, 208, .45); }
+  .links a:hover span { border-color: currentColor; }
+  .links a.bc { color: var(--rust-300); }
+  .rel .next { width: 58%; margin-left: auto; }
+  .rel .next h3 { font-size: clamp(1.25rem, 2.4vw, 1.6rem); }
+  .sg-out { display: none; }
+  .released .sg-out { display: inline; }
+  .released .sg-pre { display: none; }
+  .rel .held { width: 58%; margin-left: auto; }
+  .rel .held .art { background: var(--bone-100); }
+  .rel .held .drip { position: absolute; top: 0; left: 50%; width: 9%; height: 58%; margin-left: -4.5%; overflow: hidden; }
+  .rel .held .drip { container-type: inline-size; }
+  .rel .held .dr { position: absolute; inset: 0; transform: translateY(-100%); transition: transform 1.8s steps(6, end) .4s; }
+  .on .rel .held .dr { transform: none; }
+  .rel .held .dr i { position: absolute; left: 0; bottom: 0; width: 100%; aspect-ratio: 200 / 680; background: var(--rust-500);
+                     -webkit-mask: url(assets/img/tease-02.png) center / 100% 100% no-repeat; mask: url(assets/img/tease-02.png) center / 100% 100% no-repeat; }
+  .rel .held .dr b { position: absolute; top: 0; left: 41%; width: 13.5%; bottom: calc(340cqw - 2px); background: var(--rust-500); }  /* stem up to the top edge */
+  .rel .held h3 { font-size: var(--text-md); color: var(--muted); }
+  .rel .held .bar { display: block; height: .7em; width: 72%; background: var(--bone-100); margin: 1.1rem 0 .55rem; }  /* the title, redacted */
+  .listen .floor { margin: 5rem calc(-1 * var(--gx)) 0; color: var(--bone-200); }
+  .listen .guy { --x: 70%; }
+  @media (min-width: 900px) {
+    .listen { padding-top: 11svh; }
+    .rel { grid-template-columns: repeat(12, 1fr); gap: 2rem; align-items: start; }
+    .rel .lead { grid-column: 1 / span 5; }
+    .rel .held { grid-column: 7 / span 3; width: auto; margin: 52% 0 0; }
+    .rel .next { grid-column: 7 / span 4; width: auto; margin: 40% 0 0; }
+    .listen h2.hand { margin: 0 0 2.5rem 4%; }
+    .listen .guy { --x: 58%; }
+  }
+
+  /* =================== 3 · LIGHTS ON: about + the horns, on bone =================== */
+  .lit { --room-bg: var(--bone-100); position: relative; margin-top: 8svh; padding: 10svh var(--gx) 0; background: var(--bone-100); color: var(--ink-900); }
+  .lit .hand { display: block; font-size: clamp(2.6rem, 6vw, 3.8rem); margin: 0 0 1.5rem; }
+  .lit .blurb { margin: 0; max-width: 24ch; font-weight: 300; font-size: clamp(1.6rem, 4.4vw, 3.2rem); line-height: 1.18; letter-spacing: -0.01em; }
+  .lit .blurb .ln { display: block; }
+  .lit .note { margin: 1.25rem 0 0; }
+  .lit .note .draft { color: var(--ink-600); }
+  .lit .room { position: relative; height: 24svh; }
+  .lit .floor { position: absolute; left: calc(-1 * var(--gx)); right: calc(-1 * var(--gx)); bottom: 0; color: var(--ink-900); }
+  .lit .guy { --x: 8%; }
+  .lit .pit { position: absolute; bottom: 0; left: 48%; width: calc(var(--hh) * 2.5); height: var(--hh); overflow: hidden; --hh: clamp(60px, 10vw, 132px);
+              padding: 0; border: 0; background: none; cursor: default; -webkit-tap-highlight-color: transparent; }
+  .lit .pit i { position: absolute; inset: 0; background: var(--rust-500);
+                -webkit-mask: url(assets/img/tease-01.png) center / contain no-repeat; mask: url(assets/img/tease-01.png) center / contain no-repeat;
+                transform: translateY(101%); transition: transform 1.5s steps(5, end); }
+  .lit.up .pit i { transform: none; }
+  .lit.shy .pit i { transform: translateY(101%); transition: transform 2s steps(4, end); }
+  .lit.gone .pit i { transform: translateY(101%); transition: transform .2s steps(2, end); }
+  .lit .below { padding: calc(var(--guy-h) * .32 + .7rem) 0 6svh; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 2rem; }
+  .lit .cap { margin: 0; font-size: var(--text-sm); color: var(--ink-700); }
+  .lit .date { margin: 0; font-family: var(--font-letter); font-size: var(--text-lg); color: var(--rust-600); opacity: 0; transition: opacity .6s steps(3, end) .3s; }
+  .lit.gone .date { opacity: 1; }
+  @media (min-width: 900px) { .lit .blurb { max-width: 26ch; } .lit .pit { left: 56%; } .lit .guy { --x: 14%; } }
+
+  /* =================== 4 · ELSEWHERE =================== */
+  .else { position: relative; padding: 11svh var(--gx) 4svh; display: grid; gap: 3.5rem; }
+  .else h2 { margin: 0; font-size: clamp(2.8rem, 7vw, 4.4rem); }
+  .label { display: block; margin: 0 0 .5rem; font-size: var(--text-xs); font-weight: 400; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--muted); }
+  .big { list-style: none; margin: 0; padding: 0; }
+  .big li { overflow: hidden; padding-bottom: .05em; }
+  .big a { display: inline-block; min-height: 44px; min-width: 44px; font-weight: 400; font-size: clamp(2.2rem, 8.4vw, 4.6rem); line-height: 1.06; letter-spacing: -0.03em;
+           text-decoration: none; transform: translateY(105%); transition: transform .24s steps(3, end), color .1s; transition-delay: calc(var(--i) * 40ms), 0s; }
+  .on .big a { transform: none; }
+  .big a:hover { color: var(--rust-300); }
+  .big a.bc { color: var(--rust-300); }
+  .big a.bc:hover { color: #F0B4A3; }
+  .big.small a { font-size: clamp(1.7rem, 5.6vw, 3rem); }
+  .else .note { margin: .75rem 0 0; font-size: var(--text-sm); color: var(--muted); }
+  @media (min-width: 900px) { .else { grid-template-columns: 1.3fr 1fr; column-gap: 2rem; } .else h2 { grid-column: 1 / -1; justify-self: end; margin-right: 4%; } .else .col2 { padding-top: 4rem; } }
+
+  /* =================== 5 · MERCH: one rust circle, bleeding off the edge =================== */
+  .merch { position: relative; height: 62svh; overflow: hidden; }
+  .merch a { position: absolute; top: 4svh; right: -16vw; width: var(--d); height: var(--d); --d: min(88vw, 52svh); border-radius: 50%;
+             background: var(--rust-500); color: var(--bone-50); display: grid; place-items: center; text-decoration: none;
+             opacity: 0; transform: scale(.55); transition: opacity 0s, transform .32s steps(4, end); }
+  .merch.on a { opacity: 1; transform: none; }
+  .merch a .hw { height: calc(var(--d) * .26); transform: translateX(-9%); }
+  .merch a:hover { background: var(--rust-700); }
+  .merch a:focus-visible { outline-offset: 8px; }
+  .merch .cap { position: absolute; left: var(--gx); bottom: 8svh; margin: 0; font-size: var(--text-sm); color: var(--muted); }
+  .merch .cap b { color: var(--bone-100); font-weight: 400; }
+  @media (min-width: 900px) { .merch a { right: 8vw; } }
+
+  /* =================== 6 · THE BOTTOM: someone else is here now =================== */
+  .end { position: relative; padding: 6svh var(--gx) 0; }
+  .end .logo { height: auto; width: min(64vw, 30rem); color: var(--bone-100); }
+  .end .room { position: relative; height: 15svh; min-height: 120px; }
+  .end .floor { position: absolute; left: calc(-1 * var(--gx)); right: calc(-1 * var(--gx)); bottom: 0; color: var(--bone-200); }
+  .end .guy { --x: 46%; }
+  .end .ghost { position: absolute; bottom: -1px; left: 68%; height: calc(var(--guy-h) * 1.6); width: auto; color: var(--bone-100); opacity: 0; transition: opacity 2s steps(4, end); }
+  .end.seen .ghost { opacity: .16; }
+  .end .below { padding: calc(var(--guy-h) * .32 + .7rem) 0 1.5rem; }
+  .end .bottom { height: clamp(2.2rem, 6vw, 3.4rem); color: var(--bone-300); margin-bottom: .75rem; }
+  .end .tiny { display: flex; justify-content: space-between; gap: 1rem; margin: 0; font-size: var(--text-xs); color: var(--muted); }
+  @media (min-width: 900px) { .end .guy { --x: 60%; } .end .ghost { left: 72%; } }
+
+  /* ---------- reduced motion: no intro, no reveals, everything at rest ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .rv, .st, .big a, .merch a, .rel .held .dr, .lit .pit i, .hero .said { opacity: 1 !important; transform: none !important; transition: none; animation: none !important; translate: none !important; }
+    .floor::before { transform: none; transition: none; }
+    .gl, .glabel { display: none !important; }
+    .guy, .end .ghost, .qnav { transition: none; }
+  }
+
+  /* ---- self-hosted player: one flat bar per release. no platform, no account ---- */
+  .play { display: flex; align-items: center; gap: .9rem; margin: 1rem 0 0; max-width: 26rem; }
+  .play button { flex: none; width: 44px; height: 44px; border: 0; padding: 0; background: var(--rust-500); color: var(--night-900); cursor: pointer; display: grid; place-items: center; }
+  .play button:hover { background: var(--rust-300); }
+  .play button:focus-visible, .play .bar:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
+  .play button svg { width: 16px; height: 16px; fill: currentColor; }
+  .play .bar { position: relative; flex: 1; height: 44px; cursor: pointer; }
+  .play .bar::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(226, 223, 208, .45); }
+  .play .fill { position: absolute; left: 0; top: calc(50% - 2px); height: 4px; width: 0; background: var(--bone-100); }
+  .play .t { flex: none; min-width: 4.6em; text-align: right; font-size: .8125rem; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .play.on button { background: var(--bone-100); }
+  #sg:not(.released) .play.full { display: none; }
+  #sg.released .full ~ .tease { display: none; }   /* teaser until the full song is up */
+  /* music video: a still until clicked, then youtube loads (no youtube scripts before that) */
+  .vid { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; margin: 1.6rem 0 0; padding: 0; border: 0; background: var(--night-800); cursor: pointer; overflow: hidden; }
+  .vid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vid span { position: absolute; left: 0; bottom: 0; padding: .55rem .8rem; background: var(--rust-500); color: var(--night-900); font-size: .8125rem; font-weight: 400; letter-spacing: var(--tracking-caps); text-transform: uppercase; }
+  .vid:hover span { background: var(--rust-300); }
+  .vid:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 3px; }
+  .vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .earlier { margin: 4.5rem 0 0; max-width: 34rem; }
+  .earlier ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; }
+  .earlier h3 { margin: 0; font-weight: 300; font-size: 1.25rem; line-height: 1.2; display: inline; }
+  .earlier .m { margin-left: .6rem; font-size: var(--text-sm); color: var(--muted); }
+  .earlier .m a { color: var(--rust-300); font-weight: 400; }
+  .earlier .play { margin-top: .3rem; }
+
+  /* ---- hero player: fixed to the bottom from first paint, so anyone can hit play in under 2s ---- */
+  .hp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: .9rem;
+        padding: .45rem var(--gx) calc(.45rem + env(safe-area-inset-bottom)); background: var(--night-900); border-top: 1px solid rgba(226, 223, 208, .45); }
+  .hp .play { margin: 0; flex: 1; max-width: 46rem; }
+  /* next: a quiet icon, not a second play block. .play button / .play.on button would paint it bone-on-bone */
+  .hp .play button.nx, .hp .play.on button.nx { flex: none; width: 44px; height: 44px; border: 0; padding: 0; margin-left: -.5rem; background: none; color: var(--bone-100); cursor: pointer; display: grid; place-items: center; }
+  .hp .play button.nx:hover { background: none; color: var(--rust-300); }
+  .hp .play button.nx:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 2px; }
+  .hp .play button.nx svg { width: 15px; height: 15px; fill: currentColor; }
+  .hp-l { flex: none; display: grid; min-height: 44px; align-content: center; text-decoration: none; line-height: 1.15; }
+  .hp-n { font-weight: 400; font-size: var(--text-md); color: var(--bone-100); }
+  .hp-m { font-size: .8125rem; font-weight: 400; color: var(--rust-300); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .hp-l:hover .hp-m { color: var(--color-accent-hover); }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  @media (max-width: 599px) { .hp .play .bar { min-width: 3rem; } .hp-m { font-size: .75rem; } }
+</style>
+</head>
+<body>
+<a class="skiplink" href="#listen">skip to the music</a>
+<!-- hero player: there on first paint, every visit. same audio as the players under "listen" -->
+<div class="hp" id="hp" role="region" aria-label="player">
+  <div class="play" data-audio="assets/audio/fault-line.mp3" data-title="fault line" data-dur="4:08"></div>
+  <a class="hp-l" href="#listen"><span class="hp-n">fault line</span><span class="hp-m">all the links</span></a>
+</div>
+<h1 class="sr-only">dear you</h1>
+
+<!-- quick nav: always there on a return visit; slides in after the intro on a first visit -->
+<nav class="qnav" id="qnav" aria-label="Quick">
+  <a href="#listen" aria-label="listen"><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
+  <a href="#about" aria-label="about"><svg class="hw" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></a>
+  <a href="#elsewhere" aria-label="elsewhere"><svg class="hw" viewBox="0 0 2208 1452" aria-hidden="true" focusable="false"><use href="assets/hand/elsewhere.svg#h"/></svg></a>
+  <a href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+</nav>
+
+<main>
+  <!-- 1 · HERO -------------------------------------------------------- -->
+  <section class="hero room-s" id="s-hero" aria-label="dear you" data-stage="0">
+    <!-- scroll sentinels: passing each one snaps the hero to the next state (no scroll handler) -->
+    <i class="sent" style="top:10svh"></i><i class="sent" style="top:20svh"></i><i class="sent" style="top:30svh"></i><i class="sent" style="top:40svh"></i>
+    <div class="view">
+      <div class="photo" id="photo" data-gl>
+        <picture>
+          <source type="image/avif" srcset="assets/img/band-placeholder-1200.avif 1200w, assets/img/band-placeholder-2400.avif 2400w" sizes="(min-width:900px) 75vw, 100vw">
+          <source type="image/webp" srcset="assets/img/band-placeholder-1200.webp 1200w, assets/img/band-placeholder-2400.webp 2400w" sizes="(min-width:900px) 75vw, 100vw">
+          <img src="assets/img/band-placeholder-1200.jpg" alt="two of the band standing apart in a sandy clearing in front of pine trees" decoding="async" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="logo" id="logo">
+        <svg class="logo-svg stack" viewBox="0 0 1524 2952" aria-hidden="true" focusable="false" style="height:100%;width:auto"><use href="assets/logo-dearyou.svg#logo"/></svg>
+        <svg class="logo-svg horiz" viewBox="0 0 3072 2284" aria-hidden="true" focusable="false" style="height:100%;width:auto"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+      </div>
+      <div class="wall" id="wall">
+        <nav aria-label="Primary">
+          <a href="#listen" aria-label="listen"><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></a>
+          <a href="https://shop.dearyoutx.com" aria-label="merch"><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+        </nav>
+      </div>
+      <div class="floor" id="hero-floor"><i class="guy" data-x="46vw" data-xm="78vw"></i></div>
+      <p class="said" id="said">i must confess, what a mess.</p>
+    </div>
+  </section>
+
+  <!-- 2 · LISTEN ------------------------------------------------------ -->
+  <section class="listen room-s" id="listen" aria-labelledby="listen-h">
+    <h2 class="hand st" id="listen-h"><span class="sr-only">listen</span><svg class="hw" viewBox="0 0 1496 1492" aria-hidden="true" focusable="false"><use href="assets/hand/listen.svg#h"/></svg></h2>
+    <ul class="rel">
+      <li class="lead">
+        <span class="out st" style="--i:4" aria-hidden="true"><svg class="hw" viewBox="0 0 2000 1512" aria-hidden="true" focusable="false"><use href="assets/hand/out-now.svg#h"/></svg></span>
+        <div class="art rv" style="--i:0" data-gl>
+          <picture>
+            <source type="image/avif" srcset="assets/img/fault-line-cover-600.avif 600w, assets/img/fault-line-cover-1200.avif 1200w" sizes="(min-width: 900px) 46vw, 100vw">
+            <source type="image/webp" srcset="assets/img/fault-line-cover-600.webp 600w, assets/img/fault-line-cover-1200.webp 1200w" sizes="(min-width: 900px) 46vw, 100vw">
+            <img src="assets/img/fault-line-cover-600.jpg" alt="fault line cover: a split image of a person on a rust chair" loading="lazy" decoding="async">
+          </picture>
+        </div>
+        <h3 class="rv" style="--i:1">fault line</h3>
+        <div class="m rv" style="--i:2">single · 2026 · out now</div>
+        <ul class="links rv" style="--i:3">
+          <!-- bandcamp hidden until account access is back: <li><a class="bc" href="https://dearyoutx.bandcamp.com"><span>bandcamp</span></a></li> -->
+          <li><a href="https://open.spotify.com/album/1ndoDai42Y0f4ryhwlsadN"><span>spotify</span></a></li>
+          <li><a href="https://music.apple.com/us/album/fault-line/1895036896"><span>apple music</span></a></li>
+          <li><a href="https://www.youtube.com/watch?v=Kl_cVRIa_RQ"><span>youtube</span></a></li>
+        </ul>
+        <div class="play" data-audio="assets/audio/fault-line.mp3" data-dur="4:08" data-title="fault line"></div>
+        <button class="vid" type="button" data-yt="Kl_cVRIa_RQ" aria-label="play the fault line music video (loads youtube)"><img src="https://i.ytimg.com/vi/Kl_cVRIa_RQ/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>fault line · the video</span></button>
+      </li>
+      <!-- next single: silk & gold. pre-order until RELEASE (visitor's local midnight, like the DSPs), then "out now". -->
+      <li class="next" id="sg" data-release="2026-10-23">
+        <div class="art rv" style="--i:2" data-gl>
+          <picture>
+            <source type="image/avif" srcset="assets/img/silk-and-gold-cover-600.avif 600w, assets/img/silk-and-gold-cover-1200.avif 1200w" sizes="(min-width: 900px) 26vw, 58vw">
+            <source type="image/webp" srcset="assets/img/silk-and-gold-cover-600.webp 600w, assets/img/silk-and-gold-cover-1200.webp 1200w" sizes="(min-width: 900px) 26vw, 58vw">
+            <img src="assets/img/silk-and-gold-cover-600.jpg" alt="silk &amp; gold cover: a dark crown dripping rust" loading="lazy" decoding="async">
+          </picture>
+        </div>
+        <h3 class="rv" style="--i:3">silk &amp; gold</h3>
+        <div class="m rv" style="--i:4"><span class="sg-pre">single · out 10.23</span><span class="sg-out">single · 2026 · out now</span></div>
+        <ul class="links rv" style="--i:5">
+          <li><a href="https://sl.cmdshft.com/silkandgold"><span class="sg-pre">pre-order</span><span class="sg-out">listen</span></a></li>
+        </ul>
+        <div class="play full" data-audio="assets/audio/silk-and-gold.mp3" data-title="silk &amp; gold"></div>
+        <div class="play tease" data-audio="assets/audio/sg-teaser.mp3" data-title="silk &amp; gold teaser" data-dur="teaser · 0:18"></div>
+      </li>
+    </ul>
+    <!-- earlier singles: all on the record. plain list, a play bar each -->
+    <div class="earlier rv" style="--i:2">
+      <span class="label">earlier</span>
+      <ul>
+        <li><h3>black cat</h3><span class="m">single · 2025 · <a href="https://www.youtube.com/watch?v=nS9G1aAIvc0">video</a></span><div class="play" data-audio="assets/audio/black-cat.mp3" data-dur="3:32" data-title="black cat"></div></li>
+        <li><h3>2328</h3><span class="m">single · 2025 · <a href="https://www.youtube.com/watch?v=vbsMxqJWuKY">video</a></span><div class="play" data-audio="assets/audio/2328.mp3" data-dur="2:23" data-title="2328"></div></li>
+      </ul>
+    </div>
+    <div class="floor"><i class="guy" data-x="58%" data-xm="70%"></i></div>
+  </section>
+
+  <!-- 3 · LIGHTS ON: about + horns ----------------------------------- -->
+  <section class="lit room-s" id="about" aria-labelledby="about-h">
+    <h2 class="hand st" id="about-h"><span class="sr-only">about</span><svg class="hw" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></h2>
+    <!-- band copy -->
+    <p class="blurb" data-gl><span class="ln rv" style="--i:1">little pop punk band from big texas,</span> <span class="ln rv" style="--i:2">with a lot to say.</span></p>
+        <div class="room">
+      <button class="pit" id="pit" type="button" aria-label="something behind the floor"><i></i></button>
+      <div class="floor"><i class="guy" data-x="14%" data-xm="8%"></i></div>
+    </div>
+    <div class="below">
+      <p class="cap rv" style="--i:2">water under the bridge, but it's dripping through the walls.</p>
+      <p class="date" id="date" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 4 · ELSEWHERE --------------------------------------------------- -->
+  <section class="else" id="elsewhere" aria-labelledby="else-h">
+    <h2 class="st" id="else-h"><span class="sr-only">elsewhere</span><svg class="hw" viewBox="0 0 2208 1452" aria-hidden="true" focusable="false"><use href="assets/hand/elsewhere.svg#h"/></svg></h2>
+    <div>
+      <span class="label">hear it</span>
+      <ul class="big" data-gl>
+        <!-- bandcamp hidden until account access is back: <li><a class="bc" style="--i:0" href="https://dearyoutx.bandcamp.com">bandcamp</a></li> -->
+        <li><a style="--i:1" href="https://open.spotify.com/artist/1xtCQ3BfevUnvY2RJFsUWT">spotify</a></li>
+        <li><a style="--i:2" href="https://music.apple.com/us/artist/dear-you/449167389">apple music</a></li>
+        <li><a style="--i:3" href="https://www.youtube.com/@dearyoutx">youtube</a></li>
+      </ul>
+      
+    </div>
+    <div class="col2">
+      <span class="label">find us</span>
+      <ul class="big small" data-gl>
+        <li><a style="--i:0" href="https://www.instagram.com/dearyoutx">instagram</a></li>
+        <li><a style="--i:1" href="https://www.tiktok.com/@dearyou.tx">tiktok</a></li>
+        <li><a style="--i:2" href="https://www.facebook.com/dearyoutx">facebook</a></li>
+        <li><a style="--i:3" href="https://x.com/DearYouTX">x</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 · MERCH ------------------------------------------------------- -->
+  <section class="merch" id="merch" aria-label="merch">
+    <a href="https://shop.dearyoutx.com" data-gl><span class="sr-only">merch, at shop.dearyoutx.com</span><svg class="hw" viewBox="0 0 1488 1488" aria-hidden="true" focusable="false"><use href="assets/hand/merch.svg#h"/></svg></a>
+    <p class="cap rv" style="--i:2">shirts and things you can hold.<br><b>shop.dearyoutx.com</b></p>
+  </section>
+</main>
+
+<!-- 6 · THE BOTTOM ---------------------------------------------------- -->
+<footer class="end room-s" id="s-end">
+  <svg class="logo logo-svg st" data-gl viewBox="0 0 3072 2284" role="img" aria-label="dear you"><use href="assets/logo-dearyou-horizontal.svg#logo-h"/></svg>
+  <div class="room">
+    <svg class="ghost" viewBox="0 0 180 170" aria-hidden="true"><path fill="currentColor" d="M98 3C78 3 68 19 67 41c-1 21-5 40-13 58-10 22-25 41-45 57-6 5-9 9-9 12v2h180c-3-7-10-14-18-25-15-21-28-48-32-79-2-18-5-32-10-42C114 9 107 3 98 3Z"/></svg>
+    <div class="floor"><i class="guy" data-x="60%" data-xm="46%"></i></div>
+  </div>
+  <div class="below">
+    <svg class="hw bottom st" style="--i:3" viewBox="0 0 5204 1680" role="img" aria-label="you found the bottom." focusable="false"><use href="assets/hand/you-found-the-bottom.svg#h"/></svg>
+    <p class="tiny"><span>© dear you 2026</span><span>beaumont, texas</span></p>
+  </div>
+</footer>
+
+<script>
+  /* silk & gold: flips from pre-order to out now at local midnight on release day */
+  (function () {
+    var el = document.getElementById("sg"); if (!el) return;
+    var d = el.getAttribute("data-release").split("-");
+    var q = new URLSearchParams(location.search).get("released");
+    var out = q === "1" ? true : q === "0" ? false : Date.now() >= new Date(+d[0], d[1] - 1, +d[2]).getTime();
+    if (out) el.classList.add("released");
+  })();
+</script>
+<script>
+  /* players: one Audio per track; every release player drives its own track.
+     the bottom bar (#hp) follows whatever played last: title, play/pause, progress, seek.
+     preload none: nothing downloads until play. one track at a time. */
+  (function () {
+    var P = '<path d="M3 1.5v13l11-6.5z"/>', Z = '<path d="M3 1.5h3.6v13H3zM9.4 1.5H13v13H9.4z"/>';
+    var tracks = {}, all = [], cur = null, hpUI = null, order = [];
+    function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
+    function track(src, name, dur) {
+      if (tracks[src]) return tracks[src];
+      var a = new Audio(); a.preload = "none"; a.src = src; all.push(a);
+      var tr = tracks[src] = { a: a, name: name, dur: dur, uis: [] };
+      function sync() { tr.uis.forEach(function (u) { u.ui(); }); if (hpUI && cur === tr) hpUI.ui(); }
+      a.onplay = function () { all.forEach(function (o) { if (o !== a) o.pause(); }); if (cur !== tr) { cur = tr; if (hpUI) hpUI.bind(); } sync(); };
+      a.onpause = sync;
+      a.onended = function () { sync(); if (cur === tr) next(true); };   /* roll into the next song */
+      a.ontimeupdate = function () { tr.uis.forEach(function (u) { u.time(); }); if (hpUI && cur === tr) hpUI.time(); };
+      return tr;
+    }
+    function shell(el, name, dur) {
+      el.innerHTML = '<button type="button" aria-label="play ' + name + '"><svg viewBox="0 0 16 16" aria-hidden="true">' + P + '</svg></button>' +
+        '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + dur + '</span>';
+      return { el: el, b: el.querySelector("button"), bar: el.querySelector(".bar"), fill: el.querySelector(".fill"), t: el.querySelector(".t") };
+    }
+    function paint(x, tr) {
+      var a = tr.a, on = !a.paused;
+      x.el.classList.toggle("on", on); x.b.firstChild.innerHTML = on ? Z : P; x.b.setAttribute("aria-label", (on ? "pause " : "play ") + tr.name);
+    }
+    function tick(x, tr) {
+      var a = tr.a, pc = a.duration ? a.currentTime / a.duration * 100 : 0;
+      x.fill.style.width = pc + "%"; x.bar.setAttribute("aria-valuenow", Math.round(pc));
+      x.t.textContent = a.duration ? fmt(a.currentTime) + " / " + fmt(a.duration) : tr.dur;
+    }
+    function wire(x, get) {   /* get() = the track this control drives right now */
+      x.b.onclick = function () { var a = get().a; if (a.paused) a.play(); else a.pause(); };
+      x.bar.onclick = function (e) { var a = get().a, r = x.bar.getBoundingClientRect(), f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        if (!a.duration) { a.play(); a.addEventListener("loadedmetadata", function () { a.currentTime = f * a.duration; }, { once: true }); } else a.currentTime = f * a.duration; };
+      x.bar.onkeydown = function (e) { var a = get().a; if (!a.duration) return; if (e.key === "ArrowRight") a.currentTime += 5; else if (e.key === "ArrowLeft") a.currentTime -= 5; else return; e.preventDefault(); };
+    }
+    // release players (not the bottom bar)
+    document.querySelectorAll(".play[data-audio]").forEach(function (el) {
+      if (el.closest("#hp")) return;
+      var name = el.getAttribute("data-title").replace(/&amp;/g, "&"), dur = el.getAttribute("data-dur") || "";
+      var tr = track(el.getAttribute("data-audio"), name, dur), x = shell(el, name, dur);
+      tr.uis.push({ ui: function () { paint(x, tr); }, time: function () { tick(x, tr); } });
+      wire(x, function () { return tr; });
+      order.push({ tr: tr, el: el });
+    });
+    // next: page order, skipping players that are hidden right now (e.g. the teaser once the full song is up)
+    function next(auto) {
+      var list = order.filter(function (o) { return o.el.offsetParent !== null; })
+                      .map(function (o) { return o.tr; })
+                      .filter(function (t, i, l) { return l.indexOf(t) === i; });
+      if (!list.length) return;
+      var i = list.indexOf(cur), n = list[(i + 1) % list.length];
+      if (auto && i === list.length - 1) return;   /* stop after the last song instead of looping */
+      n.a.currentTime = 0; n.a.play();
+    }
+    // bottom bar: starts on the newest release (silk & gold once its full song is up, else fault line)
+    var hp = document.querySelector("#hp .play");
+    if (hp) {
+      var sgFull = document.querySelector("#sg.released .play.full[data-audio]");
+      var start = sgFull ? tracks[sgFull.getAttribute("data-audio")] : tracks[hp.getAttribute("data-audio")] || track(hp.getAttribute("data-audio"), "fault line", "4:08");
+      cur = start;
+      var x = shell(hp, cur.name, cur.dur), nm = document.querySelector("#hp .hp-n"), l = document.querySelector("#hp .hp-l");
+      var nx = document.createElement("button"); nx.type = "button"; nx.className = "nx"; nx.setAttribute("aria-label", "next song");
+      nx.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2v12l8.5-6z"/><path d="M11 2h3v12h-3z"/></svg>';
+      nx.onclick = function () { next(false); };
+      x.b.after(nx);
+      hp.insertBefore(l, x.bar);   /* [play] [next] [title / all the links] [progress] [time] */
+      hpUI = {
+        bind: function () { nm.textContent = cur.name; x.bar.setAttribute("aria-label", cur.name + " position"); paint(x, cur); tick(x, cur); },
+        ui: function () { paint(x, cur); }, time: function () { tick(x, cur); }
+      };
+      wire(x, function () { return cur; });
+      hpUI.bind();
+    }
+    document.querySelectorAll(".vid[data-yt]").forEach(function (v) {
+      v.onclick = function () {
+        all.forEach(function (o) { o.pause(); });
+        var f = document.createElement("iframe");
+        f.src = "https://www.youtube-nocookie.com/embed/" + v.getAttribute("data-yt") + "?autoplay=1&rel=0&modestbranding=1";
+        f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; f.allowFullscreen = true; f.title = v.getAttribute("aria-label");
+        var box = document.createElement("div"); box.className = "vid"; box.appendChild(f); v.replaceWith(box);
+      };
+    });
+  })();
+</script>
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement, $ = function (id) { return document.getElementById(id); };
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var q = new URLSearchParams(location.search);
+
+
+  // ---- the guy: one per floor. only the room you're looking at has him in it ----
+  var rooms = Array.prototype.slice.call(document.querySelectorAll(".room-s"));
+  var guys = rooms.map(function (r) { return r.querySelector(".guy"); });
+  function placeGuys() {
+    var narrow = innerWidth < 900;
+    guys.forEach(function (g) { if (g && !g.dataset.moved) g.style.setProperty("--x", narrow ? g.dataset.xm : g.dataset.x); });
+  }
+
+  // ================= GLITCH ENGINE =================
+  // Fires on section enter + scroll-direction changes only. Budget: max 3 per second (WCAG 2.3.1).
+  // No scroll-scrubbed rAF anywhere: IntersectionObserver + class toggles + steps() keyframes.
+  var G = !reduce, demo = q.get("glitch") === "demo";
+  var isRet = function () { return root.classList.contains("ret"); };
+  var rnd = function (a, b) { return a + Math.random() * (b - a); };
+  var sgn = function () { return Math.random() < .5 ? -1 : 1; };
+  var fired = [];
+  function budget() {
+    var now = performance.now();
+    fired = fired.filter(function (t) { return now - t < 1000; });
+    if (fired.length >= 3) return false;
+    fired.push(now); return true;
+  }
+  function posParent(el) {
+    for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).position !== "static") return p;
+    return document.body;
+  }
+  function inView(el) { var r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 0; }
+  // a flat copy of el, laid exactly over it (uses the on-screen rect, so transformed elements match)
+  function cloneOver(el, cls) {
+    var par = posParent(el), r = el.getBoundingClientRect(), pr = par === document.body ? { left: -scrollX, top: -scrollY } : par.getBoundingClientRect();
+    var c = el.cloneNode(true);
+    c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(function (n) { n.removeAttribute("id"); });
+    c.classList.remove("rv", "st", "g-wrong", "g-stut");
+    c.setAttribute("aria-hidden", "true"); c.inert = true;
+    c.classList.add("gl", cls);
+    var st = c.style;
+    st.left = (r.left - pr.left - (par.clientLeft || 0)) + "px"; st.top = (r.top - pr.top - (par.clientTop || 0)) + "px";
+    st.width = r.width + "px"; st.height = r.height + "px"; st.right = "auto"; st.bottom = "auto";
+    par.appendChild(c);
+    return { c: c, w: r.width, h: r.height };
+  }
+  // 1 · horizontal slice displacement: 2 bands jump sideways for 2 frames, then snap back
+  function slice(el) {
+    if (!G || !el || !inView(el) || !budget()) return;
+    for (var i = 0; i < 2; i++) {
+      var o = cloneOver(el, "slice"), a = rnd(4, 70), b = Math.max(0, 100 - a - rnd(5, 16)), d = sgn();
+      o.c.style.setProperty("--a", a + "%"); o.c.style.setProperty("--b", b + "%");
+      o.c.style.setProperty("--d1", d * rnd(10, 32) + "px"); o.c.style.setProperty("--d2", -d * rnd(4, 14) + "px");
+      setTimeout(o.c.remove.bind(o.c), 240);
+    }
+  }
+  // 2 · a hard offset duplicate in flat rust, one frame
+  function rust(el) {
+    if (!G || !el || !inView(el) || !budget()) return;
+    var dx = sgn() * Math.round(rnd(5, 11)), dy = Math.round(rnd(4, 8)), o;
+    if (el.querySelector && el.querySelector("img")) {
+      o = cloneOver(el, "rust"); o.c.classList.add("box"); o.c.innerHTML = "";
+      var w = o.w, h = o.h, ax = Math.abs(dx);
+      // only the L-shaped sliver that sticks out from behind the original shows
+      o.c.style.clipPath = dx > 0
+        ? "polygon(" + (w - ax) + "px 0," + w + "px 0," + w + "px " + h + "px,0 " + h + "px,0 " + (h - dy) + "px," + (w - ax) + "px " + (h - dy) + "px)"
+        : "polygon(0 0," + ax + "px 0," + ax + "px " + (h - dy) + "px," + w + "px " + (h - dy) + "px," + w + "px " + h + "px,0 " + h + "px)";
+    } else o = cloneOver(el, "rust");
+    o.c.style.setProperty("--rx", dx + "px"); o.c.style.setProperty("--ry", dy + "px");
+    setTimeout(o.c.remove.bind(o.c), 140);
+  }
+  // 3 · wrong place for a frame, then snap   4 · lettering stutters in
+  function seed(el) {
+    el.style.setProperty("--wx1", sgn() * rnd(10, 44) + "px"); el.style.setProperty("--wy1", sgn() * rnd(3, 16) + "px");
+    el.style.setProperty("--wx2", sgn() * rnd(4, 16) + "px"); el.style.setProperty("--wy2", sgn() * rnd(2, 6) + "px");
+  }
+  function flag(el, cls, ms) {
+    if (!G || !el || !budget()) return;
+    seed(el); el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+    setTimeout(function () { el.classList.remove(cls); }, ms);
+  }
+  var wrong = function (el) { flag(el, "g-wrong", 320); };
+  var stutter = function (el) { flag(el, "g-stut", 360); };
+  // 5 · the guy skips a few px along the line (two snaps). he never walks.
+  function skip(g) {
+    if (!G || !g || !budget()) return;
+    var cur = parseFloat(g.dataset.skip || 0), step = sgn() * rnd(6, 14);
+    if (Math.abs(cur + step) > 70) step = -step;
+    g.style.setProperty("--skip", (cur + step / 2) + "px");
+    setTimeout(function () { g.dataset.skip = cur + step; g.style.setProperty("--skip", (cur + step) + "px"); }, 90);
+  }
+  document.querySelectorAll(".rv").forEach(seed);
+
+  // ---- hero: the photo snaps into a window in 5 sizes. sentinels decide the stage, not scroll math ----
+  var hero = $("s-hero"), photo = $("photo"), logo = $("logo"), qnav = $("qnav"), hfloor = $("hero-floor");
+  var T = [], L = [], DRAW = [0, 0, .4, .75, 1], TS = [0, .3, .56, .8, 1], stage = 0;
+  function measure() {
+    var vw = innerWidth, vh = innerHeight, wide = vw >= 900;
+    var bx = photo.offsetLeft, by = photo.offsetTop, bw = photo.offsetWidth, bh = photo.offsetHeight, fy = hfloor.offsetTop;
+    var tw = vw * (wide ? .36 : .6), th = tw * bh / bw, tx = vw - (wide ? 40 : 20) - tw, ty = fy - vh * (wide ? .05 : .065) - th;
+    /* settled: the logo still spills over the photo window. wide: ~20% of the mark crosses its left edge, hanging just below it.
+       narrow: it straddles the window's top edge (below it is the floor line). */
+    var lr = logo.offsetTop, lh = logo.offsetHeight, lx = logo.offsetLeft, lw = logo.offsetWidth, gx = wide ? 40 : 20, ly, dx = 0;
+    if (wide) { ly = (ty + th + vh * .03) - (lr + lh); dx = Math.max(gx, tx + lw * .2 - lw) - lx; }
+    else { ly = (ty + lh * .35) - (lr + lh); dx = Math.max(0, tx + lw * .25 - (lx + lw)); }   /* tablets: make sure it actually crosses */
+    T = TS.map(function (t) { return "translate3d(" + (tx - bx) * t + "px," + (ty - by) * t + "px,0) scale(" + (1 + (tw / bw - 1) * t) + ")"; });
+    L = TS.map(function (t) { return "translate3d(" + dx * t + "px," + ly * t + "px,0)"; });
+  }
+  function setStage(k, quiet) {
+    var prev = stage; stage = k;
+    hero.dataset.stage = k;
+    photo.style.transform = T[k]; logo.style.transform = L[k];
+    hfloor.style.setProperty("--draw", DRAW[k]);
+    qnav.classList.toggle("on", isRet() || k === 4);
+    roomChanged();
+    if (quiet || k === prev) return;
+    slice(photo);
+    if (k === 4) { setTimeout(function () { rust(logo); }, 120); setTimeout(function () { wrong(guys[0]); }, 380); }
+  }
+  var passed = {};
+  if ("IntersectionObserver" in window) {
+    var sio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { passed[e.target.style.top] = !e.isIntersecting && e.boundingClientRect.top < 0; });
+      if (isRet()) return;
+      var n = 0; for (var key in passed) if (passed[key]) n++;
+      setStage(n);
+    });
+    hero.querySelectorAll(".sent").forEach(function (s) { sio.observe(s); });
+  }
+
+  // ---- which room are you in? (a band across the middle of the screen) ----
+  var active = null, lit = $("about"), end = $("s-end"), seenT, stareT;
+  function roomChanged() {
+    guys.forEach(function (g) { if (g) g.classList.toggle("here", !!active && g === active.querySelector(".guy") && (active !== hero || stage === 4)); });
+  }
+  var rio = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) active = e.target; else if (active === e.target) active = null; });
+    roomChanged();
+    clearTimeout(seenT);
+    if (active === end) seenT = setTimeout(function () { end.classList.add("seen"); }, reduce ? 0 : 1400);
+  }, { rootMargin: "-45% 0px -45% 0px" });
+  rooms.forEach(function (r) { rio.observe(r); });
+
+  // ---- section enter: reveals + one or two glitches the first time, a rarer one on re-entry ----
+  var targets = document.querySelectorAll(".listen, .lit, .else, .merch, .end, .lit .room");
+  function enter(el) {
+    var firstTime = !el.classList.contains("on");
+    el.classList.add("on");
+    if (el.classList.contains("room") && el.parentNode === lit) {
+      lit.classList.add("up"); lit.querySelector(".floor").classList.add("on");
+      setTimeout(function () { slice($("pit")); }, 700);          // horns glitch, even for return visitors
+      return;
+    }
+    if (isRet() || !G) return;
+    var key = el.matches("[data-gl]") ? el : el.querySelector("[data-gl]"), head = el.querySelector(".st");
+    if (firstTime) {
+      if (el === lit) { lit.classList.add("wipe"); setTimeout(function () { lit.classList.remove("wipe"); }, 400); }
+      setTimeout(function () { slice(key); }, 140);
+      if (head) setTimeout(function () { rust(head); }, 420);
+    } else if (Math.random() < .4) slice(key);
+  }
+  if ("IntersectionObserver" in window && !reduce) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) enter(e.target); }); }, { rootMargin: "0px 0px -18% 0px" });
+    targets.forEach(function (t) { io.observe(t); });
+  } else {
+    targets.forEach(function (t) { t.classList.add("on"); });
+    lit.classList.add("up"); lit.querySelector(".floor").classList.add("on");
+  }
+  document.querySelectorAll(".listen > .floor, .end .floor").forEach(function (f) { f.classList.add("on"); });
+
+  // ---- scroll: no layout reads, no transforms. only notices direction flips (and resets the stare timer) ----
+  var lastY = scrollY, lastD = 0, lastFlip = 0;
+  function onScroll() {
+    var y = scrollY, d = y > lastY ? 1 : y < lastY ? -1 : 0; lastY = y;
+    if (d && lastD && d !== lastD && performance.now() - lastFlip > 1500) { lastFlip = performance.now(); possessed(active); }
+    if (d) lastD = d;
+    clearTimeout(stareT); lit.classList.remove("shy");
+    if (active === lit && lit.classList.contains("up") && !reduce) stareT = setTimeout(function () { if (active === lit && !lit.classList.contains("gone")) lit.classList.add("shy"); }, 5000);
+  }
+  function possessed(room) {                     // you changed direction. the room noticed.
+    if (!G || !room) return;
+    if (isRet() && room !== hero && room !== lit) return;
+    var g = room.querySelector(".guy.here");
+    if (g) skip(g);
+    if (Math.random() < .5) { var ks = room.querySelectorAll("[data-gl]"); if (ks.length) setTimeout(function () { slice(ks[Math.floor(Math.random() * ks.length)]); }, 120); }
+  }
+
+  // ---- ?glitch=demo: every glitch on a loop, on whatever is on screen ----
+  if (demo) {
+    var lab = document.createElement("div"); lab.className = "glabel"; lab.setAttribute("aria-live", "polite"); document.body.appendChild(lab);
+    lab.textContent = G ? "glitch demo" : "reduced motion is on: no glitches";
+    var pick = function (sel) {
+      var a = Array.prototype.filter.call(document.querySelectorAll(sel), function (e) { return !e.classList.contains("gl") && inView(e); });
+      return a[Math.floor(Math.random() * a.length)] || null;
+    };
+    var kinds = [
+      ["slice", function () { return pick("[data-gl]"); }, slice],
+      ["rust duplicate", function () { return pick(".st, #logo, .logo-svg, [data-gl]"); }, rust],
+      ["wrong place", function () { return pick(".rv, .st"); }, wrong],
+      ["lettering stutter", function () { return pick(".st, .qnav a"); }, stutter],
+      ["guy skips", function () { return pick(".guy.here"); }, skip],
+      ["hero snap", function () { return inView(hero) && !isRet() ? hero : null; },
+        function () { [0, 1, 2, 3, 4].forEach(function (k, i) { setTimeout(function () { setStage(k, true); }, i * 350); }); }]   // <3 changes/s
+    ];
+    var ki = 0;
+    if (G) setInterval(function () {
+      for (var tries = 0; tries < kinds.length; tries++) {
+        var k = kinds[ki++ % kinds.length], t = k[1]();
+        if (t) { fired = []; lab.textContent = "glitch: " + k[0]; k[2](t); return; }
+      }
+      lab.textContent = "glitch demo: scroll to something";
+    }, 1600);
+  }
+
+  // ---- 3 pokes at the horns = a date ----
+  var pokes = 0;
+  $("pit").addEventListener("click", function () { if (++pokes === 3) { lit.classList.add("gone"); $("date").textContent = "08.17.25"; } });
+
+  // ---- he moves when you're not looking. leave the tab, come back, he's somewhere else ----
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) return;
+    guys.forEach(function (g) { if (g && g.classList.contains("here")) { g.dataset.moved = 1; g.style.setProperty("--x", Math.round(6 + Math.random() * 80) + "%"); } });
+  });
+
+  placeGuys(); measure(); setStage(isRet() ? 4 : 0, true);
+  if (isRet() && G) setTimeout(function () { slice(photo); setTimeout(function () { rust(logo); }, 380); }, 500);
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", function () { placeGuys(); measure(); setStage(stage, true); });
+})();
+</script>
+</body>
+</html>
