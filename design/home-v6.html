@@ -169,6 +169,11 @@
   .links a span { border-bottom: 1px solid rgba(226, 223, 208, .45); }
   .links a:hover span { border-color: currentColor; }
   .links a.bc { color: var(--rust-300); }
+  .rel .next { width: 58%; margin-left: auto; }
+  .rel .next h3 { font-size: clamp(1.25rem, 2.4vw, 1.6rem); }
+  .sg-out { display: none; }
+  .released .sg-out { display: inline; }
+  .released .sg-pre { display: none; }
   .rel .held { width: 58%; margin-left: auto; }
   .rel .held .art { background: var(--bone-100); }
   .rel .held .drip { position: absolute; top: 0; left: 50%; width: 9%; height: 58%; margin-left: -4.5%; overflow: hidden; }
@@ -187,6 +192,7 @@
     .rel { grid-template-columns: repeat(12, 1fr); gap: 2rem; align-items: start; }
     .rel .lead { grid-column: 1 / span 5; }
     .rel .held { grid-column: 7 / span 3; width: auto; margin: 52% 0 0; }
+    .rel .next { grid-column: 7 / span 4; width: auto; margin: 40% 0 0; }
     .listen h2.hand { margin: 0 0 2.5rem 4%; }
     .listen .guy { --x: 58%; }
   }
@@ -305,8 +311,7 @@
         <button class="been" id="been" type="button">i've been here before.</button>
       </div>
       <div class="floor" id="hero-floor"><i class="guy" data-x="46vw" data-xm="78vw"></i></div>
-      <!-- DRAFT copy -->
-      <p class="said" id="said">we were gone a while.</p>
+      <p class="said" id="said">i must confess, what a mess.</p>
       <!-- DRAFT copy: return view only. clears dyx-seen and replays the intro -->
       <button class="been replay" id="replay" type="button">show me the weird version again.</button>
     </div>
@@ -329,16 +334,25 @@
         <div class="m rv" style="--i:2">single · 2026 · out now</div>
         <ul class="links rv" style="--i:3">
           <li><a class="bc" href="https://dearyoutx.bandcamp.com"><span>bandcamp</span></a></li>
-          <li><a href="#" data-todo="spotify fault line url"><span>spotify</span></a></li>
-          <li><a href="#" data-todo="apple music fault line url"><span>apple music</span></a></li>
-          <li><a href="#" data-todo="youtube fault line url"><span>youtube</span></a></li>
+          <li><a href="https://open.spotify.com/album/1ndoDai42Y0f4ryhwlsadN"><span>spotify</span></a></li>
+          <li><a href="https://music.apple.com/us/album/fault-line/1895036896"><span>apple music</span></a></li>
+          <li><a href="https://www.youtube.com/watch?v=Kl_cVRIa_RQ"><span>youtube</span></a></li>
         </ul>
       </li>
-      <!-- next single: held until confirmed. Silk & Gold stays unnamed and uncovered. -->
-      <li class="held" aria-label="next single, not yet">
-        <div class="art rv" style="--i:2" data-gl><span class="drip" aria-hidden="true"><span class="dr"><b></b><i></i></span></span></div>
-        <span class="bar rv" style="--i:3" aria-hidden="true"></span>
-        <h3 class="rv" style="--i:4">next. not yet.</h3>
+      <!-- next single: silk & gold. pre-order until RELEASE (visitor's local midnight, like the DSPs), then "out now". -->
+      <li class="next" id="sg" data-release="2026-10-23">
+        <div class="art rv" style="--i:2" data-gl>
+          <picture>
+            <source type="image/avif" srcset="assets/img/silk-and-gold-cover-600.avif 600w, assets/img/silk-and-gold-cover-1200.avif 1200w" sizes="(min-width: 900px) 26vw, 58vw">
+            <source type="image/webp" srcset="assets/img/silk-and-gold-cover-600.webp 600w, assets/img/silk-and-gold-cover-1200.webp 1200w" sizes="(min-width: 900px) 26vw, 58vw">
+            <img src="assets/img/silk-and-gold-cover-600.jpg" alt="silk &amp; gold cover: a dark crown dripping rust" loading="lazy" decoding="async">
+          </picture>
+        </div>
+        <h3 class="rv" style="--i:3">silk &amp; gold</h3>
+        <div class="m rv" style="--i:4"><span class="sg-pre">single · out 10.23</span><span class="sg-out">single · 2026 · out now</span></div>
+        <ul class="links rv" style="--i:5">
+          <li><a href="https://sl.cmdshft.com/silkandgold"><span class="sg-pre">pre-order</span><span class="sg-out">listen</span></a></li>
+        </ul>
       </li>
     </ul>
     <div class="floor"><i class="guy" data-x="58%" data-xm="70%"></i></div>
@@ -347,16 +361,14 @@
   <!-- 3 · LIGHTS ON: about + horns ----------------------------------- -->
   <section class="lit room-s" id="about" aria-labelledby="about-h">
     <h2 class="hand st" id="about-h"><span class="sr-only">about</span><svg class="hw" viewBox="0 0 1772 1300" aria-hidden="true" focusable="false"><use href="assets/hand/about.svg#h"/></svg></h2>
-    <!-- DRAFT copy: placeholder until the band writes its own -->
-    <p class="blurb" data-gl><span class="ln rv" style="--i:1">four friends from beaumont, texas.</span> <span class="ln rv" style="--i:2">we stopped for ten years.</span> <span class="ln rv" style="--i:3">we never stopped thinking about it.</span></p>
-    <p class="note rv" style="--i:4"><span class="draft">draft · the band will write its own</span></p>
-    <div class="room">
+    <!-- band copy -->
+    <p class="blurb" data-gl><span class="ln rv" style="--i:1">little pop punk band from big texas,</span> <span class="ln rv" style="--i:2">with a lot to say.</span></p>
+        <div class="room">
       <button class="pit" id="pit" type="button" aria-label="something behind the floor"><i></i></button>
       <div class="floor"><i class="guy" data-x="14%" data-xm="8%"></i></div>
     </div>
     <div class="below">
-      <!-- DRAFT copy -->
-      <p class="cap rv" style="--i:2">don't mind him. he's always been here. <span class="draft">· draft</span></p>
+      <p class="cap rv" style="--i:2">water under the bridge, but it's dripping through the walls.</p>
       <p class="date" id="date" aria-live="polite"></p>
     </div>
   </section>
@@ -368,8 +380,8 @@
       <span class="label">hear it</span>
       <ul class="big" data-gl>
         <li><a class="bc" style="--i:0" href="https://dearyoutx.bandcamp.com">bandcamp</a></li>
-        <li><a style="--i:1" href="#" data-todo="spotify artist url">spotify</a></li>
-        <li><a style="--i:2" href="#" data-todo="apple music artist url">apple music</a></li>
+        <li><a style="--i:1" href="https://open.spotify.com/artist/1xtCQ3BfevUnvY2RJFsUWT">spotify</a></li>
+        <li><a style="--i:2" href="https://music.apple.com/us/artist/dear-you/449167389">apple music</a></li>
         <li><a style="--i:3" href="https://www.youtube.com/@dearyoutx">youtube</a></li>
       </ul>
       <p class="note rv" style="--i:4">bandcamp is the one that helps us most.</p>
@@ -378,8 +390,8 @@
       <span class="label">find us</span>
       <ul class="big small" data-gl>
         <li><a style="--i:0" href="https://www.instagram.com/dearyoutx">instagram</a></li>
-        <li><a style="--i:1" href="https://www.tiktok.com/@dearyoutx" data-todo="confirm tiktok handle">tiktok</a></li>
-        <li><a style="--i:2" href="https://www.facebook.com/dearyoutx" data-todo="confirm facebook url">facebook</a></li>
+        <li><a style="--i:1" href="https://www.tiktok.com/@dearyou.tx">tiktok</a></li>
+        <li><a style="--i:2" href="https://www.facebook.com/dearyoutx">facebook</a></li>
         <li><a style="--i:3" href="https://x.com/DearYouTX">x</a></li>
       </ul>
     </div>
@@ -405,6 +417,16 @@
   </div>
 </footer>
 
+<script>
+  /* silk & gold: flips from pre-order to out now at local midnight on release day */
+  (function () {
+    var el = document.getElementById("sg"); if (!el) return;
+    var d = el.getAttribute("data-release").split("-");
+    var q = new URLSearchParams(location.search).get("released");
+    var out = q === "1" ? true : q === "0" ? false : Date.now() >= new Date(+d[0], d[1] - 1, +d[2]).getTime();
+    if (out) el.classList.add("released");
+  })();
+</script>
 <script>
 (function () {
   "use strict";
