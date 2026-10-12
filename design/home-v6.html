@@ -291,6 +291,13 @@
   .vid:hover span { background: var(--rust-300); }
   .vid:focus-visible { outline: 2px solid var(--bone-50); outline-offset: 3px; }
   .vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .earlier { margin: 4.5rem 0 0; max-width: 34rem; }
+  .earlier ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; }
+  .earlier h3 { margin: 0; font-weight: 300; font-size: 1.25rem; line-height: 1.2; display: inline; }
+  .earlier .m { margin-left: .6rem; font-size: var(--text-sm); color: var(--muted); }
+  .earlier .m a { color: var(--rust-300); font-weight: 400; }
+  .earlier .play { margin-top: .3rem; }
 </style>
 </head>
 <body>
@@ -358,7 +365,7 @@
           <li><a href="https://music.apple.com/us/album/fault-line/1895036896"><span>apple music</span></a></li>
           <li><a href="https://www.youtube.com/watch?v=Kl_cVRIa_RQ"><span>youtube</span></a></li>
         </ul>
-        <div class="play" data-audio="assets/audio/fault-line.mp3" data-title="fault line"></div>
+        <div class="play" data-audio="assets/audio/fault-line.mp3" data-dur="4:08" data-title="fault line"></div>
         <button class="vid" type="button" data-yt="Kl_cVRIa_RQ" aria-label="play the fault line music video (loads youtube)"><img src="https://i.ytimg.com/vi/Kl_cVRIa_RQ/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>fault line · the video</span></button>
       </li>
       <!-- next single: silk & gold. pre-order until RELEASE (visitor's local midnight, like the DSPs), then "out now". -->
@@ -378,6 +385,15 @@
         <div class="play" data-audio="assets/audio/silk-and-gold.mp3" data-title="silk &amp; gold"></div>
       </li>
     </ul>
+    <!-- earlier singles: all on the record. plain list, a play bar each -->
+    <div class="earlier rv" style="--i:2">
+      <span class="label">earlier</span>
+      <ul>
+        <li><h3>black cat</h3><span class="m">single · 2025 · <a href="https://www.youtube.com/watch?v=nS9G1aAIvc0">video</a></span><div class="play" data-audio="assets/audio/black-cat.mp3" data-dur="3:32" data-title="black cat"></div></li>
+        <li><h3>2328</h3><span class="m">single · 2025 · <a href="https://www.youtube.com/watch?v=vbsMxqJWuKY">video</a></span><div class="play" data-audio="assets/audio/2328.mp3" data-dur="2:23" data-title="2328"></div></li>
+        <li><h3>lost years</h3><span class="m">single · 2025</span><div class="play" data-audio="assets/audio/lost-years.mp3" data-title="lost years"></div></li>
+      </ul>
+    </div>
     <div class="floor"><i class="guy" data-x="58%" data-xm="70%"></i></div>
   </section>
 
@@ -450,7 +466,7 @@
       var a = new Audio(); a.preload = "none"; a.src = el.getAttribute("data-audio");
       var name = el.getAttribute("data-title");
       el.innerHTML = '<button type="button" aria-label="play ' + name + '"><svg viewBox="0 0 16 16" aria-hidden="true">' + P + '</svg></button>' +
-        '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + name + '</span>';
+        '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + (el.getAttribute("data-dur") || "") + '</span>';
       var b = el.querySelector("button"), bar = el.querySelector(".bar"), fill = el.querySelector(".fill"), t = el.querySelector(".t");
       all.push(a);
       function ui() { var on = !a.paused; el.classList.toggle("on", on); b.firstChild.innerHTML = on ? Z : P; b.setAttribute("aria-label", (on ? "pause " : "play ") + name); }
