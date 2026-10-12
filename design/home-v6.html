@@ -475,44 +475,66 @@
   })();
 </script>
 <script>
-  /* players: one Audio per track, shared by every UI showing it (hero bar + the one under "listen").
+  /* players: one Audio per track; every release player drives its own track.
+     the bottom bar (#hp) follows whatever played last: title, play/pause, progress, seek.
      preload none: nothing downloads until play. one track at a time. */
   (function () {
     var P = '<path d="M3 1.5v13l11-6.5z"/>', Z = '<path d="M3 1.5h3.6v13H3zM9.4 1.5H13v13H9.4z"/>';
-    var tracks = {}, all = [];
+    var tracks = {}, all = [], cur = null, hpUI = null;
     function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
-    function track(src) {
+    function track(src, name, dur) {
       if (tracks[src]) return tracks[src];
       var a = new Audio(); a.preload = "none"; a.src = src; all.push(a);
-      var tr = tracks[src] = { a: a, uis: [] };
-      function each(f) { tr.uis.forEach(f); }
-      a.onplay = a.onpause = a.onended = function () { each(function (u) { u.ui(); }); };
-      a.ontimeupdate = function () { each(function (u) { u.time(); }); };
+      var tr = tracks[src] = { a: a, name: name, dur: dur, uis: [] };
+      function sync() { tr.uis.forEach(function (u) { u.ui(); }); if (hpUI && cur === tr) hpUI.ui(); }
+      a.onplay = function () { all.forEach(function (o) { if (o !== a) o.pause(); }); if (cur !== tr) { cur = tr; if (hpUI) hpUI.bind(); } sync(); };
+      a.onpause = a.onended = sync;
+      a.ontimeupdate = function () { tr.uis.forEach(function (u) { u.time(); }); if (hpUI && cur === tr) hpUI.time(); };
       return tr;
     }
-    // after 10.23 the hero plays silk & gold, once its full song is on the site
-    var hp = document.querySelector("#hp .play"), sgFull = document.querySelector("#sg.released .play.full");
-    if (hp && sgFull) {
-      hp.setAttribute("data-audio", sgFull.getAttribute("data-audio")); hp.setAttribute("data-title", "silk & gold"); hp.removeAttribute("data-dur");
-      document.querySelector("#hp .hp-n").textContent = "silk & gold";
-    }
-    document.querySelectorAll(".play[data-audio]").forEach(function (el) {
-      var tr = track(el.getAttribute("data-audio")), a = tr.a, name = el.getAttribute("data-title"), dur = el.getAttribute("data-dur") || "";
+    function shell(el, name, dur) {
       el.innerHTML = '<button type="button" aria-label="play ' + name + '"><svg viewBox="0 0 16 16" aria-hidden="true">' + P + '</svg></button>' +
         '<div class="bar" role="slider" tabindex="0" aria-label="' + name + ' position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div><span class="t">' + dur + '</span>';
-      var b = el.querySelector("button"), bar = el.querySelector(".bar"), fill = el.querySelector(".fill"), t = el.querySelector(".t");
-      tr.uis.push({
-        ui: function () { var on = !a.paused; el.classList.toggle("on", on); b.firstChild.innerHTML = on ? Z : P; b.setAttribute("aria-label", (on ? "pause " : "play ") + name); },
-        time: function () { var pc = a.duration ? a.currentTime / a.duration * 100 : 0; fill.style.width = pc + "%"; bar.setAttribute("aria-valuenow", Math.round(pc)); t.textContent = fmt(a.currentTime) + " / " + fmt(a.duration); }
-      });
-      b.onclick = function () { if (a.paused) { all.forEach(function (o) { if (o !== a) o.pause(); }); a.play(); } else a.pause(); };
-      function seek(f) { if (a.duration) a.currentTime = Math.min(1, Math.max(0, f)) * a.duration; }
-      bar.onclick = function (e) { var r = bar.getBoundingClientRect(), f = (e.clientX - r.left) / r.width;
-        if (!a.duration) { all.forEach(function (o) { if (o !== a) o.pause(); }); a.play(); a.addEventListener("loadedmetadata", function () { seek(f); }, { once: true }); } else seek(f); };
-      bar.onkeydown = function (e) { if (!a.duration) return; if (e.key === "ArrowRight") a.currentTime += 5; else if (e.key === "ArrowLeft") a.currentTime -= 5; else return; e.preventDefault(); };
+      return { el: el, b: el.querySelector("button"), bar: el.querySelector(".bar"), fill: el.querySelector(".fill"), t: el.querySelector(".t") };
+    }
+    function paint(x, tr) {
+      var a = tr.a, on = !a.paused;
+      x.el.classList.toggle("on", on); x.b.firstChild.innerHTML = on ? Z : P; x.b.setAttribute("aria-label", (on ? "pause " : "play ") + tr.name);
+    }
+    function tick(x, tr) {
+      var a = tr.a, pc = a.duration ? a.currentTime / a.duration * 100 : 0;
+      x.fill.style.width = pc + "%"; x.bar.setAttribute("aria-valuenow", Math.round(pc));
+      x.t.textContent = a.duration ? fmt(a.currentTime) + " / " + fmt(a.duration) : tr.dur;
+    }
+    function wire(x, get) {   /* get() = the track this control drives right now */
+      x.b.onclick = function () { var a = get().a; if (a.paused) a.play(); else a.pause(); };
+      x.bar.onclick = function (e) { var a = get().a, r = x.bar.getBoundingClientRect(), f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        if (!a.duration) { a.play(); a.addEventListener("loadedmetadata", function () { a.currentTime = f * a.duration; }, { once: true }); } else a.currentTime = f * a.duration; };
+      x.bar.onkeydown = function (e) { var a = get().a; if (!a.duration) return; if (e.key === "ArrowRight") a.currentTime += 5; else if (e.key === "ArrowLeft") a.currentTime -= 5; else return; e.preventDefault(); };
+    }
+    // release players (not the bottom bar)
+    document.querySelectorAll(".play[data-audio]").forEach(function (el) {
+      if (el.closest("#hp")) return;
+      var name = el.getAttribute("data-title").replace(/&amp;/g, "&"), dur = el.getAttribute("data-dur") || "";
+      var tr = track(el.getAttribute("data-audio"), name, dur), x = shell(el, name, dur);
+      tr.uis.push({ ui: function () { paint(x, tr); }, time: function () { tick(x, tr); } });
+      wire(x, function () { return tr; });
     });
-    // hero bar layout: [play] [title / all the links] [progress] [time]
-    if (hp) { var l = document.querySelector("#hp .hp-l"); hp.insertBefore(l, hp.querySelector(".bar")); }
+    // bottom bar: starts on the newest release (silk & gold once its full song is up, else fault line)
+    var hp = document.querySelector("#hp .play");
+    if (hp) {
+      var sgFull = document.querySelector("#sg.released .play.full[data-audio]");
+      var start = sgFull ? tracks[sgFull.getAttribute("data-audio")] : tracks[hp.getAttribute("data-audio")] || track(hp.getAttribute("data-audio"), "fault line", "4:08");
+      cur = start;
+      var x = shell(hp, cur.name, cur.dur), nm = document.querySelector("#hp .hp-n"), l = document.querySelector("#hp .hp-l");
+      hp.insertBefore(l, x.bar);   /* [play] [title / all the links] [progress] [time] */
+      hpUI = {
+        bind: function () { nm.textContent = cur.name; x.bar.setAttribute("aria-label", cur.name + " position"); paint(x, cur); tick(x, cur); },
+        ui: function () { paint(x, cur); }, time: function () { tick(x, cur); }
+      };
+      wire(x, function () { return cur; });
+      hpUI.bind();
+    }
     document.querySelectorAll(".vid[data-yt]").forEach(function (v) {
       v.onclick = function () {
         all.forEach(function (o) { o.pause(); });
